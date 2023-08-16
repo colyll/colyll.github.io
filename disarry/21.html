@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>DeDeCMS织梦短信验证码功能_城子居</title>
+<meta name="keywords" content="DeDeCMS短信验证码,织梦短信验证码功能,阿里云短信接口报错" />
+<meta name="description" content="织梦会员注册短信验证码功能，会员注册短信验证码是非常实用的功能。包括3个织梦短信接口：阿里云短信、阿里大于、云之讯短信接口。" />
+<meta name="author" content="城子居">
+<meta http-equiv="Cache-Control" content="no-transform " />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<link rel="stylesheet" href="/skin/css/style.css" />
+</head>
+<body>
+<div class="headerbg"><div id="header">
+	<div id="head">
+	<div class="logo fl"><a href="/">城子居</a></div>
+	<ul class="nav fl"><li><a href="/business/">商业</a></li><li><a href="/environment/">环境</a></li><li><a href="/uec/">UECenter</a></li><li><a href="/disarry/">杂谈</a></li><li><a href="/about/">关于博主</a></li>
+</ul>
+    <div class="user fr">
+      <div class="search fl">
+        <ul>
+          <li>
+            <form class="form-search" action="" onkeydown="if(event.keyCode==13){return false;}">
+              <input type="text" placeholder="输入搜索内容..." class="nav-search-input" id="nSearch">
+              <i class="ift icon-search"></i> 
+            </form>
+          </li>
+        </ul>
+      </div>
+		<div class="user_ico fr"><a href="/me/" rel="nofollow" class="ift icon-user" title="注册登录"></a><a class="ift icon-yejing" title="夜间模式"></a></div>
+	</div>
+  </div>
+</div></div>
+ 
+<div class="warp">
+<div class="main">
+	<div id="content-left">
+	<div class="position fl"><i class="ift icon-home"></i> <a href='https://imyme.cn/'>主页</a> > <a href='/disarry/'>杂谈</a> > </div>
+	<h1 class="arc-h1 cl pt25">DeDeCMS织梦短信验证码功能</h1>
+	<div class="infoline"><div class="arcinfo"><span class="source">来源：原创</span><span>城子居 / 2016-12-26 16:52</span></div>
+		<div class="share fr"><span id="shwb" class="ift icon-xlweibo"></span><span id="shqzone" class="ift icon-qzone"></span><div id="qrcode" class="ift icon-qrcode"></div><a href="https://imyme.cn/plus/feedback.php?aid=21" target="_blank"><span id="liuyan" class="ift icon-liuyan"></span><i id="content">…</i></a></div>
+	</div>
+<div class="description mt15">织梦会员注册短信验证码功能，会员注册短信验证码是非常实用的功能。包括3个织梦短信接口：阿里云短信、阿里大于、云之讯短信接口。...</div>
+	<div class="arc9494 arctext"><p>现在大部分网站都需要用短信验证码，因为织梦官方没有短信验证码插件，所以写了4个短信验证码插件，一个使用的是阿里云的短信验证码接口，一个使用的是阿里大于的短信验证码接口，一个使用的是阿里通信短信验证码接口，另外一个使用的是云之讯的短信接口。下面的教程包含2个织梦短信验证码接口。</p><p>我们需要新起一段专门用来说阿里的短信接口，想想一家3个SDK短信接口，是何等搞笑，令人发指。先阿里云短信、再阿里大于、再阿里通信，TMD还每个短信接口都不一样。前面写织梦默认编辑器CKeditor上传图片至阿里云OSS的插件，就领教了阿里各种文档不清不楚，各种拼凑认证Authorization，各种上传默认上传不返回数据。这次一个短信接口写3次，坑得可以。</p><p style="text-align:center"><img data-original="//colyll.github.io/upload/image/1482744923_DeDeCMS_Ucpaas_SMS.png" alt="织梦短信验证码功能接口" src="//colyll.github.io/upload/image/1482744923_DeDeCMS_Ucpaas_SMS.png" class="lazy" /></p><h2>织梦会员短信注册需要修改的地方：</h2><p>1、需要创建一个表来对验证码进行记录，防止多次发送，这里创建了一个phonecode表。<br />2、member/templets/reg-new.htm （注册模版添加元素）<br />3、member/templets/js/reg_new.js&nbsp;（验证手机号）<br />4、member/index_do.php&nbsp;（根据后台设置，判断是否发送注册验证码）<br />5、member/reg_new.php&nbsp;（验证、记录）</p><p style="text-align:center"><img data-original="//colyll.github.io/upload/image/1482742391_0.png" alt="织梦会员注册短信验证码功能界面" src="//colyll.github.io/upload/image/1482742391_0.png" class="lazy" /><br />（织梦会员注册短信验证码功能界面）</p><h2>a.使用阿里云短信接口接入：</h2><p>需要在member/index_do.php对应的位置插入阿里云短信接口代码。特别需要注意的是，阿里云短信官方demo文档是大神写的，所以普通人用起来会报命名空间错误，这个需要自己注意。另外需要更新下短息模板，现在阿里短信模板审核非常严格，不允许有其他变量，之前并没有这个问题。所以，审核不过的时候，需要减少变量。（目前已经无法开通阿里云短信接口，新开通的是阿里通信接口，不能使用这段代码，只适合很久之前就开通过阿里云短信的人）</p><pre><em class="language">PHP</em><code class="language-php"> function getrandchar($length){
+	$str = null;
+	$strPol = "0123456789abcdefghijklmnopqrstuvwxyz";
+	$max = strlen($strPol)-1;
+		for($i=0;$i&lt;$length;$i++){
+		$str.=$strPol[rand(0,$max)];
+		}
+		return $str;
+	}
+	$code = getrandchar(5);
+
+	require_once(DEDEINC.'/aliyun-php-sdk-core/Config.php');
+	use Sms\Request\V20160927 as Sms;
+	$iClientProfile = DefaultProfile::getProfile("cn-shenzhen", "your accessKey", "your accessSecret"); //登录阿里云查看： "your accessKey", "your accessSecret"
+	$client = new DefaultAcsClient($iClientProfile);    
+	$request = new Sms\SingleSendSmsRequest();
+	$request-&gt;setSignName("签名");/*签名名称*/
+	$request-&gt;setTemplateCode("SMS_1111");/*模板code*/
+	$request-&gt;setRecNum($phone);/*目标手机号*/
+	$request-&gt;setParamString("{\"code\":\"$code\",\"tel\":\"电话号码\"}");/*模板变量，请确保跟审核过的短信模版变量一致,数字一定要转换为字符串*/
+	try {
+		$response = $client-&gt;getAcsResponse($request);
+		print_r($response);
+	}
+	catch (ClientException  $e) {
+		print_r($e-&gt;getErrorCode());   
+		print_r($e-&gt;getErrorMessage());   
+	}
+	catch (ServerException  $e) {   
+		print_r($e-&gt;getErrorCode());   
+		print_r($e-&gt;getErrorMessage());
+	}
+	
+	$inquery = " INSERT INTO `dede_phonecode` (`ip`,`phone`,`phonecode`,`used`,`sendtime`) VALUES ( '$ip','$to','$code','1','$nowtime'); ";
+	$rs = $dsql-&gt;ExecuteNoneQuery2($inquery);
+	if( $rs = 1 ){
+		ShowMsg('发送成功，请注意查收！','-1');
+		exit();
+	}
+	exit();</code></pre><p>附上阿里云短信模版：<code>验证码：${code}。您正在注册，如非您本人操作，请忽略此条短信。如有疑问请与我们联系! 电话：${tel}</code></p><h2>b.使用阿里大于的短信接口接入：</h2><p>同样的需要在member/index_do.php对应的位置插入以下代码。<br />&nbsp;</p><pre><em class="language">PHP</em><code class="language-php">			function getrandchar($length){
+			$str = null;
+			//$strPol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+			$strPol = "0123456789abcdefghijklmnopqrstuvwxyz";
+			$max = strlen($strPol)-1;
+				for($i=0;$i&lt;$length;$i++){
+				$str.=$strPol[rand(0,$max)];
+				}
+				return $str;
+			}
+			$code = getrandchar(5);
+
+			require_once(DEDEINC.'/alidayu-php-sdk/TopSdk.php');
+			$client = new TopClient;
+			$client -&gt;appkey = '111111' ; //登录阿里大于查看appkey。
+			$client -&gt;secretKey = 'aaaaaaaaaaaaaa' ; //登录阿里大于查看secret。
+			$req = new AlibabaAliqinFcSmsNumSendRequest;
+			$req -&gt;setExtend( "" );
+			$req -&gt;setSmsType( "normal" );
+			$req -&gt;setSmsFreeSignName( "城子居" ); /*签名名称*/
+			$req -&gt;setSmsParam( "{\"code\":\"$code\",\"name\":\"注册\"}" ); /*模板变量，请确保跟审核过的短信模版变量一致,数字一定要转换为字符串*/
+			$req -&gt;setRecNum($phone);/*目标手机号*/
+			$req -&gt;setSmsTemplateCode( "SMS_1111111" );//登录阿里大于查看/*模板ID编号*/
+			$resp = $client -&gt;execute( $req );
+
+			$inquery = " INSERT INTO `imm_phonecode` (`ip`,`phone`,`phonecode`,`used`,`sendtime`)  VALUES ( '$ip','$to','$code','1','$nowtime'); ";
+			$rs = $dsql-&gt;ExecuteNoneQuery2($inquery);
+			if( $rs = 1 ){
+				ShowMsg('发送成功，请注意查收！','-1');
+				exit();
+			}
+			exit();</code></pre><h2>c.使用最新的阿里通信短信接口接入：</h2><pre><em class="language">PHP</em><code class="language-php">		function getrandchar($length){
+		$str = null;
+		//$strPol = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+		$strPol = "0123456789";
+		$max = strlen($strPol)-1;
+			for($i=0;$i&lt;$length;$i++){
+			$str.=$strPol[rand(0,$max)];
+			}
+			return $str;
+		}
+		$number = getrandchar(4);
+		
+		require_once(DEDEINC.'/aliyun-php-sdk-core/Config.php');
+		require_once(DEDEINC.'/Dysmsapi/Request/V20170525/SendSmsRequest.php');
+		require_once(DEDEINC.'/Dysmsapi/Request/V20170525/QuerySendDetailsRequest.php');
+
+		function sendSms() {
+			global $phone, $number;
+			
+			//此处需要替换成自己的AK信息
+			$accessKeyId = "yourAccessKeyId";
+			$accessKeySecret = "yourAccessKeySecret";
+			//短信API产品名
+			$product = "Dysmsapi";
+			//短信API产品域名
+			$domain = "dysmsapi.aliyuncs.com";
+			//暂时不支持多Region
+			$region = "cn-beijing";
+			
+			//初始化访问的acsCleint
+			$profile = DefaultProfile::getProfile($region, $accessKeyId, $accessKeySecret);
+			DefaultProfile::addEndpoint("cn-beijing", "cn-beijing", $product, $domain);
+			$acsClient= new DefaultAcsClient($profile);
+			
+			$request = new Dysmsapi\Request\V20170525\SendSmsRequest;
+			//必填-短信接收号码
+			$request-&gt;setPhoneNumbers($phone);
+			//必填-短信签名
+			$request-&gt;setSignName("99商铺网");
+			//必填-短信模板Code
+			$request-&gt;setTemplateCode("SMS_74725029");
+			//选填-假如模板中存在变量需要替换则为必填(JSON格式)
+			$request-&gt;setTemplateParam("{\"number\":\"$number\"}");
+			//选填-发送短信流水号
+			$request-&gt;setOutId("1234");
+			
+			//发起访问请求
+			$acsResponse = $acsClient-&gt;getAcsResponse($request);
+		}
+
+		sendSms();
+		
+		$inquery = " INSERT INTO `imm_phonecode` (`ip`,`phone`,`phonecode`,`used`,`sendtime`)  VALUES ( '$ip','$phone','$number','1','$nowtime'); ";
+		$rs = $dsql-&gt;ExecuteNoneQuery2($inquery);
+		if( $rs = 1 ){
+			echo "发送成功，请注意查收！";
+			exit();
+		}
+		exit();</code></pre>&nbsp;到这里阿里系的3个短信接口就全都在这里了，对应的SDK需要在阿里云官方查找下载。<h2>d.使用云之讯短信接口接入：</h2><p>同样的需要在member/index_do.php对应的位置插入云之讯短信接口代码。</p><pre><em class="language">PHP</em><code class="language-php">	function getrandchar($length){
+	$str = null;
+	$strPol = "0123456789abcdefghijklmnopqrstuvwxyz";
+	$max = strlen($strPol)-1;
+		for($i=0;$i&lt;$length;$i++){
+		$str.=$strPol[rand(0,$max)];
+		}
+		return $str;
+	}
+	require_once(DEDEINC.'/ucpaas.class.php');
+	$options['accountsid']='';  //对应ucpaas.com用户ID
+	$options['token']='';  //对应ucpaas.com里面的用户token
+	$ucpass = new Ucpaas($options);
+	$appId = ""; //对应ucpaas.com里面的项目ID
+	$to = $phone;
+	$templateId = ""; //对应ucpaas.com里面的短信模版ID
+	$code = getrandchar(5);
+	$param= $code.',短信模版参数2'.',短信模版参数3'; // $code为生成的验证码,短信模版参数2,短信模版参数3,参数之间用英文逗号间隔。
+	$ucpass-&gt;templateSMS($appId,$to,$templateId,$param);
+	
+	$inquery = " INSERT INTO `dede_phonecode` (`ip`,`phone`,`phonecode`,`used`,`sendtime`) VALUES ( '$ip','$to','$code','1','$nowtime'); ";
+	$rs = $dsql-&gt;ExecuteNoneQuery2($inquery);
+	if( $rs = 1 ){
+		ShowMsg('发送成功，请注意查收！','-1');
+		exit();
+	}
+	exit();</code></pre><p>同样的附上短信模版：<code>验证码：{1}。您正在{2}，如非您本人操作，请忽略此条短信。如有疑问请与我们联系! &nbsp;电话：{3}</code></p><h2>写在最后</h2><p>博主这里也使用的是云之讯的接口,<a rel="nofollow" target="_blank" href="https://imyme.cn/me/">注册入口</a>，阿里云短信接口测试好之后，暂时没有使用。<br />由于时间和精力的关系，我不提供免费服务，请见谅。 另外的提供一个DeDeCMS(织梦)解答群：<strong><a rel="nofollow" target="_blank" href="http://shang.qq.com/wpa/qunwpa?idkey=195335989cd128aeef033da3ffa3a87de82fecbbe758039d0993741b55b74ba9">414781201</a>&nbsp;</strong>欢迎加入！！</p><p>&nbsp;</p></div>
+	<div class="updown"><div id="good"><span class="ift icon-good"></span><span id="countgd">25</span></div><div id="bad"><span class="ift icon-trample"></span><span id="countbd">0</span></div></div>
+
+        <div class="same-bd br pt15">
+                        <ul>
+                        </ul>
+        </div>
+
+	<div class="banquan">
+		<p>本站原创内容请勿转载，因为这样大家可以聚集在这里讨论，请将本文链接分享给他/她! <br>
+		</p>
+	</div>
+	
+	<div class="content bl">
+		<div class="h-t bl pt25"><div class="t-text">文章讨论</div><hr></div>
+		<div class="content-bd bl pt15">
+		<ul>
+			</ul>
+		</div>
+	</div>
+	
+	<div class="same br pt25">
+		<div class="h-t br pt25">
+			<div class="t-text">延伸阅读</div>
+			<hr>
+		</div>
+		<div class="same-bd br pt15">
+			<ul>
+			</ul>
+		</div>
+	</div>
+	</div>
+	<div id="content-right">
+		
+		<div class="hottag br pt25">
+          <div class="h-t br">
+            <div class="t-text">热门标签</div>
+            <hr>
+          </div>
+          <div class="hottag-bd br pt15">
+            <ul>
+            </ul>
+          </div>
+        </div>
+		
+		<div class="hotlist br pt25">
+          <div class="h-t br">
+            <div class="t-text">热文文章</div>
+            <hr>
+          </div>
+          <div class="hotlist-bd br pt15">
+            <ul><li class="hot-1"><a href="/disarry/10.html" target="_blank" title="CKeditor七牛云JS SDK前端上传插件修改">CKeditor七牛云JS SDK前端上传插件修改</a></li>
+<li class="hot-2"><a href="/disarry/21.html" target="_blank" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-3"><a href="/disarry/23.html" target="_blank" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-4"><a href="/disarry/7.html" target="_blank" title="DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本">DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本</a></li>
+<li class="hot-5"><a href="/disarry/11.html" target="_blank" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+<li class="hot-6"><a href="/disarry/20.html" target="_blank" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-7"><a href="/disarry/22.html" target="_blank" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-8"><a href="/disarry/13.html" target="_blank" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-9"><a href="/disarry/18.html" target="_blank" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+<li class="hot-10"><a href="/disarry/17.html" target="_blank" title="DeDeCMS(织梦)相关文章调用优化">DeDeCMS(织梦)相关文章调用优化</a></li>
+
+            </ul>
+          </div>
+        </div>
+		
+		<div class="hotlist br pt25">
+          <div class="h-t br">
+            <div class="t-text">最新文章</div>
+            <hr>
+          </div>
+          <div class="hotlist-bd br pt15">
+            <ul><li class="hot-1"><a href="/disarry/25.html" target="_blank" title="商品规格属性联动筛选实现方案">商品规格属性联动筛选实现方案</a></li>
+<li class="hot-2"><a href="/disarry/23.html" target="_blank" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-3"><a href="/disarry/22.html" target="_blank" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-4"><a href="/disarry/21.html" target="_blank" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-5"><a href="/disarry/20.html" target="_blank" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-6"><a href="/disarry/19.html" target="_blank" title="DeDeCMS文章分页聚合功能优化">DeDeCMS文章分页聚合功能优化</a></li>
+<li class="hot-7"><a href="/disarry/18.html" target="_blank" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+<li class="hot-8"><a href="/disarry/17.html" target="_blank" title="DeDeCMS(织梦)相关文章调用优化">DeDeCMS(织梦)相关文章调用优化</a></li>
+<li class="hot-9"><a href="/disarry/13.html" target="_blank" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-10"><a href="/disarry/11.html" target="_blank" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+
+            </ul>
+          </div>
+        </div>
+		
+		<div class="dspay br pt25">
+          <div class="h-t br">
+            <div class="t-text">打赏</div>
+            <hr>
+          </div>
+          <div class="dspay-bd pt15">
+			<img src="/skin/images/zfb.png" title="支付宝打赏二维码" class="zfb fl" />
+			<img src="/skin/images/wx.png" title="微信打赏二维码" class="wx fr" />
+          </div>
+        </div>
+	</div>
+</div>
+</div>
+<div class="f-warp pt25">
+<div class="footer">
+	<dl class="f-link fl">
+		<dt class="h-t">链接</dt>
+		<dd><a href="/about/">关于我</a></dd>
+		<dd><i class="ift icon-web"></i> 网站：https://imyme.cn</dd>
+
+	</dl>
+	<dl class="f-connect fl">
+		<dt class="h-t">联系我</dt>
+		<dd><i class="ift icon-tel"></i> TEL：</dd>
+		<dd><i class="ift icon-qq"></i> QQ：<a rel="nofollow" href="http://wpa.qq.com/msgrd?v=3&uin=857859975" target="_blank">857859975</a></dd>
+		<dd><i class="ift icon-phone"></i> Phone：</dd>
+		<dd><i class="ift icon-mail"></i> E-mail：admin@imyme.cn</dd>
+		<dd><a rel="nofollow" href="/plus/leave_a_message.php"><i class="ift icon-liuyan"></i></a> 或者<a href="/me/">登录</a>后给我<a rel="nofollow" href="/plus/leave_a_message.php">留言</a></dd>
+	</dl>
+	<div class="f-dspay fr">
+		<div class="imgbox fl"><img src="/skin/images/zfb.png" title="支付宝打赏二维码" class="zfb cl" /><span class="t">支付宝二维码</span></div>
+		<div class="imgbox fr"><img src="/skin/images/wx.png" title="微信打赏二维码" class="wx cl" /><span class="t">微信二维码</span></div>
+	</div>
+	<a id="go-top" href="javascript:void(0)" class="ift icon-top"></a>
+	<div class="copyright cl">&copy; 2010-2016 城子居（https://imyme.cn）版权所有  &nbsp;&nbsp;网站备案：<a href="http://www.miibeian.gov.cn/" rel="nofollow" >粤ICP备14066401号</a></div>
+</div>
+</div>
+<script type="text/javascript" src="https://ss1.bdstatic.com/5eN1bjq8AAUYm2zgoY3K/r/www/cache/static/protocol/https/jquery/jquery-1.10.2.min_f2fb5194.js"></script>
+<script type="text/javascript" src="/skin/js/config.js"></script>
+<script type="text/javascript">if(top != self){location.href = "https://imyme.cn";}</script>
+
+
+<script type="text/javascript" src="/skin/js/jquery.qrcode.min.js"></script>
+<script type="text/javascript">
+
+var a = 21;
+var t = "DeDeCMS织梦短信验证码功能";
+var f = "织梦会员注册短信验证码功能，会员注册短信验证码是非常实用的功能。包括3个织梦短信接口：阿里云短信、阿里大于、云之讯短信接口。";
+var ba ="https://imyme.cn";
+
+eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--)r[e(c)]=k[c]||e(c);k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('$(S).1p(6(){3 d=S.2v;3 c=\'i\'+\'m\'+\'y\'+\'m\'+\'e\'+\'.\'+\'c\'+\'n\';4(d!==c){$("2q").27()}3 g=a;3 h=9.X.H/2-22;3 i=9.X.F/2-1Z;3 j=t;3 k=$(".1V 1R").1d("1O");3 l=9.1k.1l;3 m="<a 1l=\\""+D+"\\">"+D+"</a>";3 n=f;6 11(a,b,c,d){9.M("19://1N.1b.1c/P/P.E?1M="+p(d)+"&1i="+p(a.1j(/&1L;/g," ").1j(/<1K \\/>/g," "))+"&I="+p(b),"P 1b","H=1J,F=Y,Z="+h+",10="+i+",1I=7,1H=7,15=7, 16=7,1k=7, 17=7")}6 18(a,b,c,d,e){9.M(\'19://1G.1F.1E.1c/1D-1C/1B/1y?1i=\'+p(a)+\'&I=\'+p(b)+\'&1w=\'+p(c)+\'&1v=\'+p(d),\'1u\',\'15=7,F=Y,H=1t,10=\'+i+\',Z=\'+h+\',17=7,16=1q\')}6 J(x){3 a=D+\'/V/21.E?1n=\'+g+\'&\'+x;3 b=$.W({I:a,1m:B});3 c=1r(\'(\'+b.1s+\')\');3 d=0;3 d=T(c.1g)+T(c.1f);$("#1x").z(c.1g);$("#1z").z(c.1f);$("#1A").z(d)}$("#R").w(6(){4(8("v")){3 a=8("v");4(a.O("|"+g+"|")>-1){u B}}J("R");L("v",g,C);$("#R").o().G("Q","#N")});$("#U").w(6(){4(8("v")){3 a=8("v");4(a.O("|"+g+"|")>-1){u B}}J("U");L("v",g,C);$("#U").o().G("Q","#N")});$("#1P").w(6(){11(j,l,m,k)});$("#1Q").w(6(){18(j,l,n,m,k)});$("#r").1S(6(){4($("#r").o().1T>0){$("#r").o().1U()}1a{$(\'#r\').r({F:12,H:12,z:l})}});$("#r").1W(6(){$("#r").o().1X()});J()});6 1Y(x,y,b){3 c=a;3 d=y;3 e=x;3 f=8(\'K\');3 g=20.1o(1e 23().24()/25);3 h=D+\'/V/26.E\';4(8(\'K\')){4(f.O("|"+d+"|")>-1){u B}}4(g-8(\'1h\')<5){28("29 2a!");u B}$.W({2b:\'2c\',I:h,2d:{\'1n\':c,\'2e\':d,\'2f\':e},1m:2g,2h:\'2i\'});L(\'K\',d,C);2j(\'1h\',g,C);b.G("Q","#N");3 i=b.o("i").z();i=T(i)+1;b.o("i").z(i)}(6(){3 c=2k;3 c=$("#2l");3 d=c.2m("i[2n=2o 2p-14]");3 f=c.1d("2r");d.G({2s:"2t"});c.2u(6(){3 a=c.A();4(a==f)c.A("")});3 g=1e 2w("^\\\\s*$","i");d.w(6(){3 a=c.A();3 b="/V/14.E?q=";4(a==f)u;4(!g.2x(a)){b+=a;9.M(b)}1a{c.A(f);u}});$(S).2y(6(e){4(!e)e=9.2z;4((e.2A||e.2B)==13){4(c.A()=="")u;d.w()}})})();',62,162,'|||var|if||function|no|GetCookie|window|||||||||||||||children|encodeURIComponent||qrcode|||return|gbpost|click|||text|val|false|31|ba|php|width|css|height|url|count|ffid|SetCookieStr|open|FF4400|indexOf|share|color|good|document|parseInt|bad|plus|ajax|screen|600|top|left|shareTSina|128||search|scrollbars|resizable|status|shareQzone|http|else|weibo|com|attr|new|badpost|goodpost|ptime|title|replace|location|href|async|aid|round|ready|yes|eval|responseText|450|_blank|site|summary|countgd|cgi_qzshare_onekey|countbd|content|qzshare|bin|cgi|qq|qzone|sns|menubar|toolbar|500|br|nbsp|pic|service|src|shwb|shqzone|img|mouseover|length|show|arctext|mouseout|hide|postBadGood|300|Math|fb_count|250|Date|getTime|1000|feedback|remove|alert|Too|Fast|type|POST|data|fid|stype|true|dataType|json|SetCookie|null|nSearch|next|class|ift|icon|body|placeholder|cursor|pointert|focus|domain|RegExp|test|keydown|event|keyCode|which'.split('|'),0,{}))
+
+</script>
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>阿里云OSS、七牛云CKeditor上传插件_城子居</title>
+<meta name="keywords" content="CKeditor 七牛云,CKeditor 阿里云,CKeditor 阿里云OSS" />
+<meta name="description" content="新版CKeditor七牛云、阿里云OSS插件修改基于CKeditor 4.7的源码，保留了CKeditor原有的上传功能，新增配置上传至七牛云和阿里云OSS功能。相比之前版本，多了上传至阿里云的功能，去掉了七牛云" />
+<meta name="author" content="城子居">
+<meta http-equiv="Cache-Control" content="no-transform " />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<link rel="stylesheet" href="/skin/css/style.css" />
+</head>
+<body>
+<div class="headerbg"><div id="header">
+	<div id="head">
+	<div class="logo fl"><a href="/">城子居</a></div>
+	<ul class="nav fl"><li><a href="/business/">商业</a></li><li><a href="/environment/">环境</a></li><li><a href="/uec/">UECenter</a></li><li><a href="/disarry/">杂谈</a></li><li><a href="/about/">关于博主</a></li>
+</ul>
+    <div class="user fr">
+      <div class="search fl">
+        <ul>
+          <li>
+            <form class="form-search" action="" onkeydown="if(event.keyCode==13){return false;}">
+              <input type="text" placeholder="输入搜索内容..." class="nav-search-input" id="nSearch">
+              <i class="ift icon-search"></i> 
+            </form>
+          </li>
+        </ul>
+      </div>
+		<div class="user_ico fr"><a href="/me/" rel="nofollow" class="ift icon-user" title="注册登录"></a><a class="ift icon-yejing" title="夜间模式"></a></div>
+	</div>
+  </div>
+</div></div>
+ 
+<div class="warp">
+<div class="main">
+	<div id="content-left">
+	<div class="position fl"><i class="ift icon-home"></i> <a href='https://imyme.cn/'>主页</a> > <a href='/disarry/'>杂谈</a> > </div>
+	<h1 class="arc-h1 cl pt25">阿里云OSS、七牛云CKeditor上传插件</h1>
+	<div class="infoline"><div class="arcinfo"><span class="source">来源：原创</span><span>城子居 / 2017-03-25 20:05</span></div>
+		<div class="share fr"><span id="shwb" class="ift icon-xlweibo"></span><span id="shqzone" class="ift icon-qzone"></span><div id="qrcode" class="ift icon-qrcode"></div><a href="https://imyme.cn/plus/feedback.php?aid=23" target="_blank"><span id="liuyan" class="ift icon-liuyan"></span><i id="content">…</i></a></div>
+	</div>
+<div class="description mt15">新版CKeditor七牛云、阿里云OSS插件修改基于CKeditor 4.7的源码，保留了CKeditor原有的上传功能，新增配置上传至七牛云和阿里云OSS功能。相比之前版本，多了上传至阿里云的功能，去掉了七牛云...</div>
+	<div class="arc9494 arctext"><p>新版CKeditor七牛云、阿里云OSS插件修改基于CKeditor 4.7的源码，保留了CKeditor原有的上传功能，新增配置上传至七牛云和阿里云OSS功能。相比之前版本，多了上传至阿里云的功能，去掉了七牛云JS-SDK。因为前端只用到上传功能，所以没必要使用七牛云的完整功能的JS-SDK。此版本支持配置上传到七牛云、阿里云OSS、本地服务器，非常方便。</p><h2>新版功能和改变</h2><p>1、支持配置上传到阿里云OSS<br />2、支持配置上传到七牛云<br />3、支持截图上传、拖拽上传<br />4、支持从word黏贴图片上传（IE9+）<br />5、不再使用七牛云官方JS-SDK<br />6、使用Plupload上传<br />7、上传文件名使用：时间(ms)+_+原文件名</p><p style="text-align:center"><img alt="阿里云OSS、七牛云通用CKeditor上传插件" data-original="//colyll.github.io/upload/image/1490443693952_ckeditor_Qiniu_AliOSS.png" src="//colyll.github.io/upload/image/1490443693952_ckeditor_Qiniu_AliOSS.png" class="lazy" /></p><h2>上传环境配置</h2><p><strong>a、上传至阿里云OSS</strong>，需要先配置签名文件。我们上传时需要签名，签名由服务器端的SDK生成。例如这里我用到的是php版本的服务器SDK,只需要一个get.php文件，具体需要参考阿里云OSS官方SDK配置文档。配置好之后，访问这个文件就可以获得签名了，需要输出policyBase64、accessid、signature、path_key(dir参数可选)，以便于我们后面在ckeditor中使用。（<strong>以下代码配置在调用ckeditor的页面</strong>）</p><pre><em class="language">JavaScript</em><code class="language-javascript">    var xmlhttp;
+    if (window.XMLHttpRequest) {
+	xmlhttp = new XMLHttpRequest()
+} else if (window.ActiveXObject) {
+	try {
+		xmlhttp = new ActiveXObject("MSXML2.XMLHTTP")
+	} catch (e) {
+		xmlhttp = new ActiveXObject("Microsoft.XMLHTTP")
+	}
+}
+    phpUrl = './get.php';  // 配置好的阿里云OSS SDK访问地址，这里是php的。
+    xmlhttp.open( "GET", phpUrl, false );
+    xmlhttp.send( null );
+    var obj = eval ("(" + xmlhttp.responseText+ ")");
+    policyBase64 = obj['policy'];  //以下变量名不可修改，CKeditor中有用到。
+    accessid = obj['accessid'];
+    signature = obj['signature'];
+    expire = parseInt(obj['expire']);
+    path_key = obj['dir'];</code></pre><p><br /><strong>b、上传至七牛云，</strong>需要提供token验证。所以在使用ckeditor编辑器之前，我们先需要配置服务器端SDK生成一个用于上传的uptoken变量。服务器端SDK配置参考七牛云官方文档。（<strong>以下代码配置在调用ckeditor的页面</strong>）</p><pre><em class="language">JavaScript</em><code class="language-javascript">    // 由七牛云服务器端SDK生成，变量名uptoken不要修改，因为在ckeditor中有用到。
+    // 服务器SDK配置方法，参考七牛云官方文档。
+    uptoken = 'xxxxxx_Your_token_xxxxxxxx';</code></pre><h2>Plupload、CKeditor引入</h2><p>在图片上传对话窗口，需要Plupload来上传文件到阿里云OSS或者七牛云。这里我们需要下载pluoload文件，然后引入plupload.full.min.js&nbsp;（<strong>以下代码配置在调用ckeditor的页面</strong>）</p><pre><em class="language">HTML</em><code class="language-html">&lt;!-- // 如果你的ckeditor是由程序引入的，则需要保证在引入编辑器之前
+     // 先输出签名或者uotoken，然后引入plupload，再引入编辑器。--&gt;
+&lt;script language="javascript" src="../js/plupload.full.min.js"&gt;&lt;/script&gt;
+&lt;script language="javascript" src="../ckeditor/ckeditor.js"&gt;&lt;/script&gt;</code></pre><h2>CKeditor配置</h2><p>需要在ckeditor/config.js中配置一些必要的参数。除了原本CKeditor的配置选项之外，我把一些需要用到的参数也加在其中了，比如云上传地址、Bucket地址。</p><pre><em class="language">JavaScript</em><code class="language-javascript">/**
+ * Copyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or http://ckeditor.com/license
+ */
+
+CKEDITOR.editorConfig = function( config ) {
+
+	// 至少需要加载uploadimage,filebrowser两个扩展
+	config.extraPlugins = 'uploadimage,filebrowser';
+
+
+	// Save images to Qiniu or Ali OSS. If seted saveto, must be set: BucketDomain
+	config.saveto = 'qiniu';  //标记值(alioss|qiniu|local)其中local代表filebrowserImageUploadUrl
+    config.BucketDomain = 'https://img.imyme.cn'; //Bucket绑定的域名
+    config.UploadDomain = 'https://up.qbox.me';   //七牛云、阿里云OSS上传地址，视情况而定
+	config.PluploadFlashSwfUrl = '/js/Moxie.swf'; //Plupload 中flash地址
+
+	// Images use lazyload. If seted lazyload, must be set: lazyloadattribute, config.extraAllowedContent
+	// config.lazyload = true;  //图片加载启用lazyload
+	// config.lazyloadAttribute = 'data-original'; //储存lazyload真实图片地址
+	// config.lazyloadCss = 'lazy';  //lazyload 标记CSS值
+	// config.extraAllowedContent = 'img[data-original]';  //设置图片保存储存lazyload值
+
+	config.filebrowserImageBrowseUrl = "../select_images.php";
+	config.filebrowserFlashBrowseUrl = "../select_media.php";
+	config.filebrowserImageUploadUrl  = "../select_images_post.php";
+
+};</code></pre><h2>写在最后</h2><p>1、我把新版文件也放在原来的地方，方便有收藏的人看到更新。<br />2、如果是dedecms之类需要拖拽上传、黏贴上传功能的，需要确定编辑器正常加载了uplodimage，fliebrowser插件，可能需要修改dedecms程序，否者会导致功能不可用。<br />3、正式环境中的samples文件夹可以删掉。<br />4、上传到阿里云OSS或者七牛云，只需要配置对应的环境。<br />最后，由于时间和精力的关系，我不提供免费服务，请见谅。<br /><br />下载链接：http://pan.baidu.com/s/1kUUVjCV&nbsp; &nbsp; 提取码：eife &nbsp;自立更生互助QQ群：CKeditor_Plugins_for_Qiniu&nbsp;<strong><a rel="nofollow" target="_blank" href="http://shang.qq.com/wpa/qunwpa?idkey=399456d39b664781c278dd036ae7c835f195659993735b0c8b99dbe77bcffd74">159257448</a></strong></p></div>
+	<div class="updown"><div id="good"><span class="ift icon-good"></span><span id="countgd">25</span></div><div id="bad"><span class="ift icon-trample"></span><span id="countbd">0</span></div></div>
+
+        <div class="same-bd br pt15">
+                        <ul>
+                        </ul>
+        </div>
+
+	<div class="banquan">
+		<p>本站原创内容请勿转载，因为这样大家可以聚集在这里讨论，请将本文链接分享给他/她! <br>
+		</p>
+	</div>
+	
+	<div class="content bl">
+		<div class="h-t bl pt25"><div class="t-text">文章讨论</div><hr></div>
+		<div class="content-bd bl pt15">
+		<ul>
+			</ul>
+		</div>
+	</div>
+	
+	<div class="same br pt25">
+		<div class="h-t br pt25">
+			<div class="t-text">延伸阅读</div>
+			<hr>
+		</div>
+		<div class="same-bd br pt15">
+			<ul>
+			</ul>
+		</div>
+	</div>
+	</div>
+	<div id="content-right">
+		
+		<div class="hottag br pt25">
+          <div class="h-t br">
+            <div class="t-text">热门标签</div>
+            <hr>
+          </div>
+          <div class="hottag-bd br pt15">
+            <ul>
+<li><a href="/tags.php?/CKeditor+%E4%B8%83%E7%89%9B%E4%BA%91/" class="btn">CKeditor 七牛云</a></li>
+<li><a href="/tags.php?/CKeditor+%E9%98%BF%E9%87%8C%E4%BA%91/" class="btn">CKeditor 阿里云</a></li>
+            </ul>
+          </div>
+        </div>
+		
+		<div class="hotlist br pt25">
+          <div class="h-t br">
+            <div class="t-text">热文文章</div>
+            <hr>
+          </div>
+          <div class="hotlist-bd br pt15">
+            <ul><li class="hot-1"><a href="/disarry/10.html" target="_blank" title="CKeditor七牛云JS SDK前端上传插件修改">CKeditor七牛云JS SDK前端上传插件修改</a></li>
+<li class="hot-2"><a href="/disarry/21.html" target="_blank" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-3"><a href="/disarry/23.html" target="_blank" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-4"><a href="/disarry/7.html" target="_blank" title="DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本">DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本</a></li>
+<li class="hot-5"><a href="/disarry/11.html" target="_blank" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+<li class="hot-6"><a href="/disarry/20.html" target="_blank" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-7"><a href="/disarry/22.html" target="_blank" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-8"><a href="/disarry/13.html" target="_blank" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-9"><a href="/disarry/18.html" target="_blank" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+<li class="hot-10"><a href="/disarry/17.html" target="_blank" title="DeDeCMS(织梦)相关文章调用优化">DeDeCMS(织梦)相关文章调用优化</a></li>
+
+            </ul>
+          </div>
+        </div>
+		
+		<div class="hotlist br pt25">
+          <div class="h-t br">
+            <div class="t-text">最新文章</div>
+            <hr>
+          </div>
+          <div class="hotlist-bd br pt15">
+            <ul><li class="hot-1"><a href="/disarry/25.html" target="_blank" title="商品规格属性联动筛选实现方案">商品规格属性联动筛选实现方案</a></li>
+<li class="hot-2"><a href="/disarry/23.html" target="_blank" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-3"><a href="/disarry/22.html" target="_blank" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-4"><a href="/disarry/21.html" target="_blank" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-5"><a href="/disarry/20.html" target="_blank" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-6"><a href="/disarry/19.html" target="_blank" title="DeDeCMS文章分页聚合功能优化">DeDeCMS文章分页聚合功能优化</a></li>
+<li class="hot-7"><a href="/disarry/18.html" target="_blank" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+<li class="hot-8"><a href="/disarry/17.html" target="_blank" title="DeDeCMS(织梦)相关文章调用优化">DeDeCMS(织梦)相关文章调用优化</a></li>
+<li class="hot-9"><a href="/disarry/13.html" target="_blank" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-10"><a href="/disarry/11.html" target="_blank" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+
+            </ul>
+          </div>
+        </div>
+		
+		<div class="dspay br pt25">
+          <div class="h-t br">
+            <div class="t-text">打赏</div>
+            <hr>
+          </div>
+          <div class="dspay-bd pt15">
+			<img src="/skin/images/zfb.png" title="支付宝打赏二维码" class="zfb fl" />
+			<img src="/skin/images/wx.png" title="微信打赏二维码" class="wx fr" />
+          </div>
+        </div>
+	</div>
+</div>
+</div>
+<div class="f-warp pt25">
+<div class="footer">
+	<dl class="f-link fl">
+		<dt class="h-t">链接</dt>
+		<dd><a href="/about/">关于我</a></dd>
+		<dd><i class="ift icon-web"></i> 网站：https://imyme.cn</dd>
+
+	</dl>
+	<dl class="f-connect fl">
+		<dt class="h-t">联系我</dt>
+		<dd><i class="ift icon-tel"></i> TEL：</dd>
+		<dd><i class="ift icon-qq"></i> QQ：<a rel="nofollow" href="http://wpa.qq.com/msgrd?v=3&uin=857859975" target="_blank">857859975</a></dd>
+		<dd><i class="ift icon-phone"></i> Phone：</dd>
+		<dd><i class="ift icon-mail"></i> E-mail：admin@imyme.cn</dd>
+		<dd><a rel="nofollow" href="/plus/leave_a_message.php"><i class="ift icon-liuyan"></i></a> 或者<a href="/me/">登录</a>后给我<a rel="nofollow" href="/plus/leave_a_message.php">留言</a></dd>
+	</dl>
+	<div class="f-dspay fr">
+		<div class="imgbox fl"><img src="/skin/images/zfb.png" title="支付宝打赏二维码" class="zfb cl" /><span class="t">支付宝二维码</span></div>
+		<div class="imgbox fr"><img src="/skin/images/wx.png" title="微信打赏二维码" class="wx cl" /><span class="t">微信二维码</span></div>
+	</div>
+	<a id="go-top" href="javascript:void(0)" class="ift icon-top"></a>
+	<div class="copyright cl">&copy; 2010-2016 城子居（https://imyme.cn）版权所有  &nbsp;&nbsp;网站备案：<a href="http://www.miibeian.gov.cn/" rel="nofollow" >粤ICP备14066401号</a></div>
+</div>
+</div>
+<script type="text/javascript" src="https://ss1.bdstatic.com/5eN1bjq8AAUYm2zgoY3K/r/www/cache/static/protocol/https/jquery/jquery-1.10.2.min_f2fb5194.js"></script>
+<script type="text/javascript" src="/skin/js/config.js"></script>
+<script type="text/javascript">if(top != self){location.href = "https://imyme.cn";}</script>
+
+
+<script type="text/javascript" src="/skin/js/jquery.qrcode.min.js"></script>
+<script type="text/javascript">
+
+var a = 23;
+var t = "阿里云OSS、七牛云CKeditor上传插件";
+var f = "新版CKeditor七牛云、阿里云OSS插件修改基于CKeditor 4.7的源码，保留了CKeditor原有的上传功能，新增配置上传至七牛云和阿里云OSS功能。相比之前版本，多了上传至阿里云的功能，去掉了七牛云";
+var ba ="https://imyme.cn";
+
+eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--)r[e(c)]=k[c]||e(c);k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('$(S).1p(6(){3 d=S.2v;3 c=\'i\'+\'m\'+\'y\'+\'m\'+\'e\'+\'.\'+\'c\'+\'n\';4(d!==c){$("2q").27()}3 g=a;3 h=9.X.H/2-22;3 i=9.X.F/2-1Z;3 j=t;3 k=$(".1V 1R").1d("1O");3 l=9.1k.1l;3 m="<a 1l=\\""+D+"\\">"+D+"</a>";3 n=f;6 11(a,b,c,d){9.M("19://1N.1b.1c/P/P.E?1M="+p(d)+"&1i="+p(a.1j(/&1L;/g," ").1j(/<1K \\/>/g," "))+"&I="+p(b),"P 1b","H=1J,F=Y,Z="+h+",10="+i+",1I=7,1H=7,15=7, 16=7,1k=7, 17=7")}6 18(a,b,c,d,e){9.M(\'19://1G.1F.1E.1c/1D-1C/1B/1y?1i=\'+p(a)+\'&I=\'+p(b)+\'&1w=\'+p(c)+\'&1v=\'+p(d),\'1u\',\'15=7,F=Y,H=1t,10=\'+i+\',Z=\'+h+\',17=7,16=1q\')}6 J(x){3 a=D+\'/V/21.E?1n=\'+g+\'&\'+x;3 b=$.W({I:a,1m:B});3 c=1r(\'(\'+b.1s+\')\');3 d=0;3 d=T(c.1g)+T(c.1f);$("#1x").z(c.1g);$("#1z").z(c.1f);$("#1A").z(d)}$("#R").w(6(){4(8("v")){3 a=8("v");4(a.O("|"+g+"|")>-1){u B}}J("R");L("v",g,C);$("#R").o().G("Q","#N")});$("#U").w(6(){4(8("v")){3 a=8("v");4(a.O("|"+g+"|")>-1){u B}}J("U");L("v",g,C);$("#U").o().G("Q","#N")});$("#1P").w(6(){11(j,l,m,k)});$("#1Q").w(6(){18(j,l,n,m,k)});$("#r").1S(6(){4($("#r").o().1T>0){$("#r").o().1U()}1a{$(\'#r\').r({F:12,H:12,z:l})}});$("#r").1W(6(){$("#r").o().1X()});J()});6 1Y(x,y,b){3 c=a;3 d=y;3 e=x;3 f=8(\'K\');3 g=20.1o(1e 23().24()/25);3 h=D+\'/V/26.E\';4(8(\'K\')){4(f.O("|"+d+"|")>-1){u B}}4(g-8(\'1h\')<5){28("29 2a!");u B}$.W({2b:\'2c\',I:h,2d:{\'1n\':c,\'2e\':d,\'2f\':e},1m:2g,2h:\'2i\'});L(\'K\',d,C);2j(\'1h\',g,C);b.G("Q","#N");3 i=b.o("i").z();i=T(i)+1;b.o("i").z(i)}(6(){3 c=2k;3 c=$("#2l");3 d=c.2m("i[2n=2o 2p-14]");3 f=c.1d("2r");d.G({2s:"2t"});c.2u(6(){3 a=c.A();4(a==f)c.A("")});3 g=1e 2w("^\\\\s*$","i");d.w(6(){3 a=c.A();3 b="/V/14.E?q=";4(a==f)u;4(!g.2x(a)){b+=a;9.M(b)}1a{c.A(f);u}});$(S).2y(6(e){4(!e)e=9.2z;4((e.2A||e.2B)==13){4(c.A()=="")u;d.w()}})})();',62,162,'|||var|if||function|no|GetCookie|window|||||||||||||||children|encodeURIComponent||qrcode|||return|gbpost|click|||text|val|false|31|ba|php|width|css|height|url|count|ffid|SetCookieStr|open|FF4400|indexOf|share|color|good|document|parseInt|bad|plus|ajax|screen|600|top|left|shareTSina|128||search|scrollbars|resizable|status|shareQzone|http|else|weibo|com|attr|new|badpost|goodpost|ptime|title|replace|location|href|async|aid|round|ready|yes|eval|responseText|450|_blank|site|summary|countgd|cgi_qzshare_onekey|countbd|content|qzshare|bin|cgi|qq|qzone|sns|menubar|toolbar|500|br|nbsp|pic|service|src|shwb|shqzone|img|mouseover|length|show|arctext|mouseout|hide|postBadGood|300|Math|fb_count|250|Date|getTime|1000|feedback|remove|alert|Too|Fast|type|POST|data|fid|stype|true|dataType|json|SetCookie|null|nSearch|next|class|ift|icon|body|placeholder|cursor|pointert|focus|domain|RegExp|test|keydown|event|keyCode|which'.split('|'),0,{}))
+
+</script>
+</body>
+</html>

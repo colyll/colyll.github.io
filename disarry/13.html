@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>为什么DeDeCMS不安全？DeDeCMS后台安全性讨论_城子居</title>
+<meta name="keywords" content="DeDeCMS不安全,DeDeCMS安全设置,DeDeCMS安全优化,DeDeCMS后台安全性" />
+<meta name="description" content="很多人都说DeDeCMS不安全，但大多数人都没想过为什么DeDeCMS不安全？安全不是绝对的，站长在安全方面必须要有思考。下面说一些影响网站安全的行为和操作。" />
+<meta name="author" content="城子居">
+<meta http-equiv="Cache-Control" content="no-transform " />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<link rel="stylesheet" href="/skin/css/style.css" />
+</head>
+<body>
+<div class="headerbg"><div id="header">
+	<div id="head">
+	<div class="logo fl"><a href="/">城子居</a></div>
+	<ul class="nav fl"><li><a href="/business/">商业</a></li><li><a href="/environment/">环境</a></li><li><a href="/uec/">UECenter</a></li><li><a href="/disarry/">杂谈</a></li><li><a href="/about/">关于博主</a></li>
+</ul>
+    <div class="user fr">
+      <div class="search fl">
+        <ul>
+          <li>
+            <form class="form-search" action="" onkeydown="if(event.keyCode==13){return false;}">
+              <input type="text" placeholder="输入搜索内容..." class="nav-search-input" id="nSearch">
+              <i class="ift icon-search"></i> 
+            </form>
+          </li>
+        </ul>
+      </div>
+		<div class="user_ico fr"><a href="/me/" rel="nofollow" class="ift icon-user" title="注册登录"></a><a class="ift icon-yejing" title="夜间模式"></a></div>
+	</div>
+  </div>
+</div></div>
+ 
+<div class="warp">
+<div class="main">
+	<div id="content-left">
+	<div class="position fl"><i class="ift icon-home"></i> <a href='https://imyme.cn/'>主页</a> > <a href='/disarry/'>杂谈</a> > </div>
+	<h1 class="arc-h1 cl pt25">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</h1>
+	<div class="infoline"><div class="arcinfo"><span class="source">来源：原创</span><span>城子居 / 2016-08-09 13:53</span></div>
+		<div class="share fr"><span id="shwb" class="ift icon-xlweibo"></span><span id="shqzone" class="ift icon-qzone"></span><div id="qrcode" class="ift icon-qrcode"></div><a href="https://imyme.cn/plus/feedback.php?aid=13" target="_blank"><span id="liuyan" class="ift icon-liuyan"></span><i id="content">…</i></a></div>
+	</div>
+<div class="description mt15">很多人都说DeDeCMS不安全，但大多数人都没想过为什么DeDeCMS不安全？安全不是绝对的，站长在安全方面必须要有思考。下面说一些影响网站安全的行为和操作。...</div>
+	<div class="arc9494 arctext"><p>DeDeCMS安全性考虑不周，主要是没考虑到很多小白站长，一些小白站长的操作就是第六人般的存在，帮助骇客黑自己。如果站长在网站安全性上有考虑，基本就可以避免一些因为低级行为而导致的安全问题。我就拿dedecms网站后台来说一下安全问题。</p>
+
+<p style="text-align:center"><img alt="dedecms网站管理后台" src="//colyll.github.io/upload/image/1470721800_dedecms.png" /></p>
+
+<h2>网站后台被搜索引擎收录</h2>
+
+<p>对，没错。很多网站后台操作人员，在不经意间就把自己网站后台贴到前端显示出来了，而且还被蜘蛛收录了。这个问题对于公司最常见，很多人同时使用一个后台：①编辑为了给文章添加一张图片，把网站后台的预览地址贴了上去。②编辑为了加个链接，把后台文章的管理路径贴上去了。③在网站前端页面添加后台登录地址。</p>
+
+<p>处理方法：1.在服务器端对管理后台做访问限制，蜘蛛访问后台路径，返回404。2.如果公司是专线独立IP，可以对IP做访问限制。3.修改默认管理后台标题&ldquo;xxx内容管理系统&rdquo;，即使被收录，如果收录量大骇客也不一定能找到后台。4.不在任何位置泄露网站的后台地址。</p>
+
+<h2>网站后台出站链接问题</h2>
+
+<p>很多人看来，这没什么问题。其实这里暗藏非常大的危机，这里是暴露网站管理后台的重要地方。这些出站链接形式包括：①直接链接外网站点。②调用外网资源。③加载第三方广告、统计。④自动更新功能。⑤后台插件功能。写到这里，可能大家都知道了，你的网站后台dede官方是知道的。你应该还知道，dede官方更新服务器曾经被黑过。具体说下这些链接为什么会有泄漏网站后台的风险，一旦网站后台触发访问站外，就会留下一个http&nbsp;Referer头信息，这里面就会包含你的管理后台路径。上面这几种情况，除第①种需要点击触发之外，其他都是默认触发的。所以可见dedecms的后台管理路径是多么的脆弱。这个问题不只是dedecms存在，基本所有的web端管理后台，都有这样的问题。</p>
+
+<p>处理方法：1.禁止任何通过管理后台直接请求外网的行为。2.条件允许的情况下，对访问后台的IP做限制。3.如果非要请求外网，先过滤掉影响网站安全的数据。4.用插件前，先按照上面几点，排查下是否有请求外网数据的可能。</p>
+
+<h2>浏览器历史记录泄漏网站后台</h2>
+
+<p>这个很好理解了，主要是在别人的电脑上使用网站管理后台的时候需要注意。所以如果在不得已需要在别人电脑上登录网站管理后台的时候，退出之后，需要对浏览器进行清空缓存操作。</p>
+
+<h2>写在最后</h2>
+
+<p>看似安全的web后台，原来到处都是风险。所以安全行为很重要，也要很小心。关于dedecms安全性问题，我之前做了一些工作《<a href="https://imyme.cn/disarry/7.html" target="_blank">DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本</a>》，虽然织梦官方已经放出了php7.0的兼容性支持，但是对于有二次开发多的，php兼容性排查还是有价值的，而且此方案的一些安全脚本和操作，是很有价值的。</p>
+</div>
+	<div class="updown"><div id="good"><span class="ift icon-good"></span><span id="countgd">1</span></div><div id="bad"><span class="ift icon-trample"></span><span id="countbd">0</span></div></div>
+
+        <div class="same-bd br pt15">
+                        <ul>
+                        </ul>
+        </div>
+
+	<div class="banquan">
+		<p>本站原创内容请勿转载，因为这样大家可以聚集在这里讨论，请将本文链接分享给他/她! <br>
+		</p>
+	</div>
+	
+	<div class="content bl">
+		<div class="h-t bl pt25"><div class="t-text">文章讨论</div><hr></div>
+		<div class="content-bd bl pt15">
+		<ul>
+			</ul>
+		</div>
+	</div>
+	
+	<div class="same br pt25">
+		<div class="h-t br pt25">
+			<div class="t-text">延伸阅读</div>
+			<hr>
+		</div>
+		<div class="same-bd br pt15">
+			<ul>
+			</ul>
+		</div>
+	</div>
+	</div>
+	<div id="content-right">
+		
+		<div class="hottag br pt25">
+          <div class="h-t br">
+            <div class="t-text">热门标签</div>
+            <hr>
+          </div>
+          <div class="hottag-bd br pt15">
+            <ul>
+<li><a href="/tags.php?/DeDeCMS%E4%B8%8D%E5%AE%89%E5%85%A8/" class="btn">DeDeCMS不安全</a></li>
+<li><a href="/tags.php?/DeDeCMS%E5%AE%89%E5%85%A8%E8%AE%BE%E7%BD%AE/" class="btn">DeDeCMS安全设置</a></li>
+<li><a href="/tags.php?/DeDeCMS%E5%AE%89%E5%85%A8%E4%BC%98%E5%8C%96/" class="btn">DeDeCMS安全优化</a></li>
+<li><a href="/tags.php?/DeDeCMS/" class="btn">DeDeCMS</a></li>
+            </ul>
+          </div>
+        </div>
+		
+		<div class="hotlist br pt25">
+          <div class="h-t br">
+            <div class="t-text">热文文章</div>
+            <hr>
+          </div>
+          <div class="hotlist-bd br pt15">
+            <ul><li class="hot-1"><a href="/disarry/10.html" target="_blank" title="CKeditor七牛云JS SDK前端上传插件修改">CKeditor七牛云JS SDK前端上传插件修改</a></li>
+<li class="hot-2"><a href="/disarry/21.html" target="_blank" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-3"><a href="/disarry/23.html" target="_blank" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-4"><a href="/disarry/7.html" target="_blank" title="DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本">DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本</a></li>
+<li class="hot-5"><a href="/disarry/11.html" target="_blank" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+<li class="hot-6"><a href="/disarry/20.html" target="_blank" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-7"><a href="/disarry/22.html" target="_blank" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-8"><a href="/disarry/13.html" target="_blank" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-9"><a href="/disarry/18.html" target="_blank" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+<li class="hot-10"><a href="/disarry/17.html" target="_blank" title="DeDeCMS(织梦)相关文章调用优化">DeDeCMS(织梦)相关文章调用优化</a></li>
+
+            </ul>
+          </div>
+        </div>
+		
+		<div class="hotlist br pt25">
+          <div class="h-t br">
+            <div class="t-text">最新文章</div>
+            <hr>
+          </div>
+          <div class="hotlist-bd br pt15">
+            <ul><li class="hot-1"><a href="/disarry/25.html" target="_blank" title="商品规格属性联动筛选实现方案">商品规格属性联动筛选实现方案</a></li>
+<li class="hot-2"><a href="/disarry/23.html" target="_blank" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-3"><a href="/disarry/22.html" target="_blank" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-4"><a href="/disarry/21.html" target="_blank" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-5"><a href="/disarry/20.html" target="_blank" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-6"><a href="/disarry/19.html" target="_blank" title="DeDeCMS文章分页聚合功能优化">DeDeCMS文章分页聚合功能优化</a></li>
+<li class="hot-7"><a href="/disarry/18.html" target="_blank" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+<li class="hot-8"><a href="/disarry/17.html" target="_blank" title="DeDeCMS(织梦)相关文章调用优化">DeDeCMS(织梦)相关文章调用优化</a></li>
+<li class="hot-9"><a href="/disarry/13.html" target="_blank" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-10"><a href="/disarry/11.html" target="_blank" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+
+            </ul>
+          </div>
+        </div>
+		
+		<div class="dspay br pt25">
+          <div class="h-t br">
+            <div class="t-text">打赏</div>
+            <hr>
+          </div>
+          <div class="dspay-bd pt15">
+			<img src="/skin/images/zfb.png" title="支付宝打赏二维码" class="zfb fl" />
+			<img src="/skin/images/wx.png" title="微信打赏二维码" class="wx fr" />
+          </div>
+        </div>
+	</div>
+</div>
+</div>
+<div class="f-warp pt25">
+<div class="footer">
+	<dl class="f-link fl">
+		<dt class="h-t">链接</dt>
+		<dd><a href="/about/">关于我</a></dd>
+		<dd><i class="ift icon-web"></i> 网站：https://imyme.cn</dd>
+
+	</dl>
+	<dl class="f-connect fl">
+		<dt class="h-t">联系我</dt>
+		<dd><i class="ift icon-tel"></i> TEL：</dd>
+		<dd><i class="ift icon-qq"></i> QQ：<a rel="nofollow" href="http://wpa.qq.com/msgrd?v=3&uin=857859975" target="_blank">857859975</a></dd>
+		<dd><i class="ift icon-phone"></i> Phone：</dd>
+		<dd><i class="ift icon-mail"></i> E-mail：admin@imyme.cn</dd>
+		<dd><a rel="nofollow" href="/plus/leave_a_message.php"><i class="ift icon-liuyan"></i></a> 或者<a href="/me/">登录</a>后给我<a rel="nofollow" href="/plus/leave_a_message.php">留言</a></dd>
+	</dl>
+	<div class="f-dspay fr">
+		<div class="imgbox fl"><img src="/skin/images/zfb.png" title="支付宝打赏二维码" class="zfb cl" /><span class="t">支付宝二维码</span></div>
+		<div class="imgbox fr"><img src="/skin/images/wx.png" title="微信打赏二维码" class="wx cl" /><span class="t">微信二维码</span></div>
+	</div>
+	<a id="go-top" href="javascript:void(0)" class="ift icon-top"></a>
+	<div class="copyright cl">&copy; 2010-2016 城子居（https://imyme.cn）版权所有  &nbsp;&nbsp;网站备案：<a href="http://www.miibeian.gov.cn/" rel="nofollow" >粤ICP备14066401号</a></div>
+</div>
+</div>
+<script type="text/javascript" src="https://ss1.bdstatic.com/5eN1bjq8AAUYm2zgoY3K/r/www/cache/static/protocol/https/jquery/jquery-1.10.2.min_f2fb5194.js"></script>
+<script type="text/javascript" src="/skin/js/config.js"></script>
+<script type="text/javascript">if(top != self){location.href = "https://imyme.cn";}</script>
+
+
+<script type="text/javascript" src="/skin/js/jquery.qrcode.min.js"></script>
+<script type="text/javascript">
+
+var a = 13;
+var t = "为什么DeDeCMS不安全？DeDeCMS后台安全性讨论";
+var f = "很多人都说DeDeCMS不安全，但大多数人都没想过为什么DeDeCMS不安全？安全不是绝对的，站长在安全方面必须要有思考。下面说一些影响网站安全的行为和操作。";
+var ba ="https://imyme.cn";
+
+eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--)r[e(c)]=k[c]||e(c);k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('$(S).1p(6(){3 d=S.2v;3 c=\'i\'+\'m\'+\'y\'+\'m\'+\'e\'+\'.\'+\'c\'+\'n\';4(d!==c){$("2q").27()}3 g=a;3 h=9.X.H/2-22;3 i=9.X.F/2-1Z;3 j=t;3 k=$(".1V 1R").1d("1O");3 l=9.1k.1l;3 m="<a 1l=\\""+D+"\\">"+D+"</a>";3 n=f;6 11(a,b,c,d){9.M("19://1N.1b.1c/P/P.E?1M="+p(d)+"&1i="+p(a.1j(/&1L;/g," ").1j(/<1K \\/>/g," "))+"&I="+p(b),"P 1b","H=1J,F=Y,Z="+h+",10="+i+",1I=7,1H=7,15=7, 16=7,1k=7, 17=7")}6 18(a,b,c,d,e){9.M(\'19://1G.1F.1E.1c/1D-1C/1B/1y?1i=\'+p(a)+\'&I=\'+p(b)+\'&1w=\'+p(c)+\'&1v=\'+p(d),\'1u\',\'15=7,F=Y,H=1t,10=\'+i+\',Z=\'+h+\',17=7,16=1q\')}6 J(x){3 a=D+\'/V/21.E?1n=\'+g+\'&\'+x;3 b=$.W({I:a,1m:B});3 c=1r(\'(\'+b.1s+\')\');3 d=0;3 d=T(c.1g)+T(c.1f);$("#1x").z(c.1g);$("#1z").z(c.1f);$("#1A").z(d)}$("#R").w(6(){4(8("v")){3 a=8("v");4(a.O("|"+g+"|")>-1){u B}}J("R");L("v",g,C);$("#R").o().G("Q","#N")});$("#U").w(6(){4(8("v")){3 a=8("v");4(a.O("|"+g+"|")>-1){u B}}J("U");L("v",g,C);$("#U").o().G("Q","#N")});$("#1P").w(6(){11(j,l,m,k)});$("#1Q").w(6(){18(j,l,n,m,k)});$("#r").1S(6(){4($("#r").o().1T>0){$("#r").o().1U()}1a{$(\'#r\').r({F:12,H:12,z:l})}});$("#r").1W(6(){$("#r").o().1X()});J()});6 1Y(x,y,b){3 c=a;3 d=y;3 e=x;3 f=8(\'K\');3 g=20.1o(1e 23().24()/25);3 h=D+\'/V/26.E\';4(8(\'K\')){4(f.O("|"+d+"|")>-1){u B}}4(g-8(\'1h\')<5){28("29 2a!");u B}$.W({2b:\'2c\',I:h,2d:{\'1n\':c,\'2e\':d,\'2f\':e},1m:2g,2h:\'2i\'});L(\'K\',d,C);2j(\'1h\',g,C);b.G("Q","#N");3 i=b.o("i").z();i=T(i)+1;b.o("i").z(i)}(6(){3 c=2k;3 c=$("#2l");3 d=c.2m("i[2n=2o 2p-14]");3 f=c.1d("2r");d.G({2s:"2t"});c.2u(6(){3 a=c.A();4(a==f)c.A("")});3 g=1e 2w("^\\\\s*$","i");d.w(6(){3 a=c.A();3 b="/V/14.E?q=";4(a==f)u;4(!g.2x(a)){b+=a;9.M(b)}1a{c.A(f);u}});$(S).2y(6(e){4(!e)e=9.2z;4((e.2A||e.2B)==13){4(c.A()=="")u;d.w()}})})();',62,162,'|||var|if||function|no|GetCookie|window|||||||||||||||children|encodeURIComponent||qrcode|||return|gbpost|click|||text|val|false|31|ba|php|width|css|height|url|count|ffid|SetCookieStr|open|FF4400|indexOf|share|color|good|document|parseInt|bad|plus|ajax|screen|600|top|left|shareTSina|128||search|scrollbars|resizable|status|shareQzone|http|else|weibo|com|attr|new|badpost|goodpost|ptime|title|replace|location|href|async|aid|round|ready|yes|eval|responseText|450|_blank|site|summary|countgd|cgi_qzshare_onekey|countbd|content|qzshare|bin|cgi|qq|qzone|sns|menubar|toolbar|500|br|nbsp|pic|service|src|shwb|shqzone|img|mouseover|length|show|arctext|mouseout|hide|postBadGood|300|Math|fb_count|250|Date|getTime|1000|feedback|remove|alert|Too|Fast|type|POST|data|fid|stype|true|dataType|json|SetCookie|null|nSearch|next|class|ift|icon|body|placeholder|cursor|pointert|focus|domain|RegExp|test|keydown|event|keyCode|which'.split('|'),0,{}))
+
+</script>
+</body>
+</html>

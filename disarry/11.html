@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS_城子居</title>
+<meta name="keywords" content="DeDeCMS整合七牛云储存,DeDeCMS 七牛云,DeDeCMS七牛云" />
+<meta name="description" content="织梦集成上传至七牛云、阿里云OSS，集成功能包括：图集文件上传、文章图片上传。简单配置一键上传至七牛云或者阿里云OSS，节省服务器带宽，提升加载速度。" />
+<meta name="author" content="城子居">
+<meta http-equiv="Cache-Control" content="no-transform " />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<link rel="stylesheet" href="/skin/css/style.css" />
+</head>
+<body>
+<div class="headerbg"><div id="header">
+	<div id="head">
+	<div class="logo fl"><a href="/">城子居</a></div>
+	<ul class="nav fl"><li><a href="/business/">商业</a></li><li><a href="/environment/">环境</a></li><li><a href="/uec/">UECenter</a></li><li><a href="/disarry/">杂谈</a></li><li><a href="/about/">关于博主</a></li>
+</ul>
+    <div class="user fr">
+      <div class="search fl">
+        <ul>
+          <li>
+            <form class="form-search" action="" onkeydown="if(event.keyCode==13){return false;}">
+              <input type="text" placeholder="输入搜索内容..." class="nav-search-input" id="nSearch">
+              <i class="ift icon-search"></i> 
+            </form>
+          </li>
+        </ul>
+      </div>
+		<div class="user_ico fr"><a href="/me/" rel="nofollow" class="ift icon-user" title="注册登录"></a><a class="ift icon-yejing" title="夜间模式"></a></div>
+	</div>
+  </div>
+</div></div>
+ 
+<div class="warp">
+<div class="main">
+	<div id="content-left">
+	<div class="position fl"><i class="ift icon-home"></i> <a href='https://imyme.cn/'>主页</a> > <a href='/disarry/'>杂谈</a> > </div>
+	<h1 class="arc-h1 cl pt25">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</h1>
+	<div class="infoline"><div class="arcinfo"><span class="source">来源：原创</span><span>城子居 / 2016-07-20 13:20</span></div>
+		<div class="share fr"><span id="shwb" class="ift icon-xlweibo"></span><span id="shqzone" class="ift icon-qzone"></span><div id="qrcode" class="ift icon-qrcode"></div><a href="https://imyme.cn/plus/feedback.php?aid=11" target="_blank"><span id="liuyan" class="ift icon-liuyan"></span><i id="content">…</i></a></div>
+	</div>
+<div class="description mt15">织梦集成上传至七牛云、阿里云OSS，集成功能包括：图集文件上传、文章图片上传。简单配置一键上传至七牛云或者阿里云OSS，节省服务器带宽，提升加载速度。...</div>
+	<div class="arc9494 arctext"><p>七牛云提供免费的http月流量10G(<a rel="nofollow" target="_blank" href="https://portal.qiniu.com/signup?code=3lmip8vwnlnpu">这里注册享优惠</a>)，对于普通的博客来说完全够用，所以本文就介绍下DeDeCMS(织梦)怎么最大化的利用七牛云来节省服务器带宽、流量、储存空间，并且提高网站的加载速度。默认的DeDeCMS是不支持七牛云的。织梦集成上传至七牛云、阿里云OSS，集成功能包括：图集文件上传、文章图片上传。简单配置一键上传至七牛云或者阿里云OSS。<strong>由于时间关系，下文只是文章图片上传至七牛云的教程，不包含图集上传的功能。</strong>图集上传的功能也已经整理好，只是确实是没时间写教程了。</p><iframe height=380 width=640 src='https://player.youku.com/embed/XMjgxNzY4MzY0OA==' frameborder=0 'allowfullscreen'></iframe><h2>DeDeCMS(织梦)整合七牛云、织梦整合阿里云OSS的优势</h2><p>1、节省自身服务器带宽、流量、储存空间，因为使用前端JS 上传到七牛云，全局替换织梦默认的swfupload，使用当今流行的plupload完成。<br />2、提高网站加载速度，因为大部分的流量由七牛云分发，减少了自身服务器带宽的占用，七牛云的CDN比普通的自建服务器还是要快的。<br />3、不破坏系统兼容性，可以后台配置储存位置，如果哪天想用回自己服务器储存图片，只需要修改一个网站后台选项即可。</p><h2>DeDeCMS(织梦)整合七牛云储存/阿里云OSS思路</h2><p>在编辑文章前，通过网站后台设置图片储存位置(七牛云或者自己服务器)，然后获取对应的图片地址。如果你使用DeDeCMS默认编辑器CKeditor，可以参考《<a target="_blank" href="https://imyme.cn/disarry/23.html">阿里云OSS、七牛云CKeditor上传插件</a>》。</p><h2>对DeDeCMS(织梦)所做的修改</h2><p>1、安装php-SDK(用于生成uptoken)。<br />安装过程可以参考七牛云官方文档 地址：http://developer.qiniu.com/resource/official.html#sdk。我们这里采用比较简单的方法，直接拷贝文件至网站目录，下面贴一下相对的目录。</p><blockquote><p>include/autoload.php &nbsp;//七牛云php-SDK 7.0 &nbsp;直接下载过来的，下面的src也是。<br />include/js/plupload.full.min.js&nbsp;//七牛云js-SDK &nbsp;要用到的plupload<br />include/src/Qiniu</p></blockquote><p>2、增加后台配置选项。<br />我们需要添加一些设置，以方便设置七牛云参数，以及后期一些可能的修改，比如要换回自己服务器储存图片呢。</p><p style="text-align:center"><img alt="后台添加参数管理" src="//colyll.github.io/upload/image/1469009801_sysconfig.png" /></p><p>然后我们在管理目录下的config.php中加入七牛云php-SDK的初始化参数，生成uptoken。</p><pre><em class="language">PHP</em><code class="language-php">//七牛云初始化
+require_once(DEDEINC.'/autoload.php');  //引入七牛云php-SDK 7
+$qiniu_access_key = empty($QINIU_ACCESS_KEY)?'your_qiniu_access_key':$QINIU_ACCESS_KEY; //优先使用管理后台设置的，这里指定一个默认的，放在这里，没有文件管理权限的管理员看不到。
+$qiniu_secret_key = empty($QINIU_SECRET_KEY)?'your_qiniu_secret_key':$QINIU_SECRET_KEY;//同上
+$qiniu_upload_domain = empty($QINIU_UPLOAD_DOMAIN)?'http:upload.qiniu.com':$QINIU_UPLOAD_DOMAIN;//七牛云上传域名，https需要设置对应的域名，只影响JS-SDK拖拽上传和剪切板上传。
+$qiniu_bucket_domain = empty($QINIU_BUCKET_DOMAIN)?'your_qiniu_bucket_domain':$QINIU_BUCKET_DOMAIN;//用来拼凑完整URL。
+$qiniu_bucket = empty($QINIU_BUCKET)?'your_qiniu_bucket':$QINIU_BUCKET;//七牛云php-SDK 7初始化时，需要知道空间名。
+
+use Qiniu\Auth;
+$auth = new Auth($qiniu_access_key, $qiniu_secret_key);
+use Qiniu\Storage\BucketManager;
+$bucketMgr = new BucketManager($auth);//删除七牛云资源时需要用到。
+$qiniu_uptoken = $auth-&gt;uploadToken($qiniu_bucket);//需要在前端调用编辑器前输出。</code></pre><p>后面环境初始化，以及编辑器的一些操作，可以参考《<a target="_blank" href="https://imyme.cn/disarry/23.html">阿里云OSS、七牛云CKeditor上传插件</a>》。<br />3、修改DeDeCMS图片上传处理逻辑和过程。<br />因为DeDeCMS(织梦)默认是上传到本地服务器，所以我们需要对上传的逻辑和处理过程做一些修改，同时要保证DeDeCMS(织梦)原来的图片上传功能不受到影响。我们需要修改管理目录下的/inc/inc_archives_functions.php文件，需要处理下织梦的图片处理函数，位置比较多，下面贴下代码段。</p><pre><em class="language">PHP</em><code class="language-php">$qiniu_bucket_domain_str ='#^'.quotemeta($GLOBALS['qiniu_bucket_domain']).'#i';</code></pre><pre><em class="language">PHP</em><code class="language-php">if(preg_match("#".$basehost."#i", $value) || !preg_match("#^http:\/\/#i", $value)
+	|| ($cfg_basehost != $basehost &amp;&amp; preg_match("#".$cfg_basehost."#i", $value))
+	|| preg_match($GLOBALS['qiniu_bucket_domain_str'], $value))
+	{
+		continue;
+}</code></pre><pre><em class="language">PHP</em><code class="language-php">{
+	$picname = preg_replace("/[\"|'| ]{1,}/", '', $img_array[0]);
+	if(preg_match("#_lit\.#", $picname)) {$litpic = $picname;}
+	else if(preg_match($GLOBALS['qiniu_bucket_domain_str'], $picname)){$litpic = $picname;}
+	else $litpic = GetDDImage('ddfirst', $picname,1);
+}</code></pre><pre><em class="language">PHP</em><code class="language-php">if(preg_match($GLOBALS['qiniu_bucket_domain_str'], $picname)){
+	$litpic = $picname;
+	return $litpic;
+}</code></pre><pre><em class="language">PHP</em><code class="language-php"> if($isremote==1 &amp;&amp; preg_match("#^http:\/\/#i", $handurl) &amp;&amp; !preg_match($GLOBALS['qiniu_bucket_domain_str'], $handurl))
+{
+	$ddinfos = GetRemoteImage($handurl, $cuserLogin-&gt;getUserID());
+	if(!is_array($ddinfos))
+	{
+		$litpic = "";
+	}
+	else
+	{
+		$filename = $ddinfos[0];
+	}
+	$isrm_up = TRUE;
+
+}</code></pre><h2>写在最后</h2><p>上面就是织梦文章图片七牛云储存的上传方案了，这个方案的优势在不需要消耗自己服务器的流量、带宽、磁盘空间，直接通过浏览器把图片上传到七牛云服务器。而且支持织梦采用最新的CKditor编辑器，可以拖拽上传和剪切板黏贴上传、word黏贴上传（仅IE9+）。并且在使用图片对话框上传的时候支持大于4M的文件断点续传等。织梦集成上传至七牛云、阿里云OSS，集成功能包括：图集文件上传、文章图片上传。简单配置一键上传至七牛云或者阿里云OSS。</p><p>另外本人很抱歉，不提供免费的服务，请见谅。</p></div>
+	<div class="updown"><div id="good"><span class="ift icon-good"></span><span id="countgd">18</span></div><div id="bad"><span class="ift icon-trample"></span><span id="countbd">0</span></div></div>
+
+        <div class="same-bd br pt15">
+                        <ul>
+                        </ul>
+        </div>
+
+	<div class="banquan">
+		<p>本站原创内容请勿转载，因为这样大家可以聚集在这里讨论，请将本文链接分享给他/她! <br>
+		</p>
+	</div>
+	
+	<div class="content bl">
+		<div class="h-t bl pt25"><div class="t-text">文章讨论</div><hr></div>
+		<div class="content-bd bl pt15">
+		<ul>
+			</ul>
+		</div>
+	</div>
+	
+	<div class="same br pt25">
+		<div class="h-t br pt25">
+			<div class="t-text">延伸阅读</div>
+			<hr>
+		</div>
+		<div class="same-bd br pt15">
+			<ul>
+			</ul>
+		</div>
+	</div>
+	</div>
+	<div id="content-right">
+		
+		<div class="hottag br pt25">
+          <div class="h-t br">
+            <div class="t-text">热门标签</div>
+            <hr>
+          </div>
+          <div class="hottag-bd br pt15">
+            <ul>
+            </ul>
+          </div>
+        </div>
+		
+		<div class="hotlist br pt25">
+          <div class="h-t br">
+            <div class="t-text">热文文章</div>
+            <hr>
+          </div>
+          <div class="hotlist-bd br pt15">
+            <ul><li class="hot-1"><a href="/disarry/10.html" target="_blank" title="CKeditor七牛云JS SDK前端上传插件修改">CKeditor七牛云JS SDK前端上传插件修改</a></li>
+<li class="hot-2"><a href="/disarry/21.html" target="_blank" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-3"><a href="/disarry/23.html" target="_blank" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-4"><a href="/disarry/7.html" target="_blank" title="DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本">DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本</a></li>
+<li class="hot-5"><a href="/disarry/11.html" target="_blank" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+<li class="hot-6"><a href="/disarry/20.html" target="_blank" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-7"><a href="/disarry/22.html" target="_blank" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-8"><a href="/disarry/13.html" target="_blank" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-9"><a href="/disarry/18.html" target="_blank" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+<li class="hot-10"><a href="/disarry/17.html" target="_blank" title="DeDeCMS(织梦)相关文章调用优化">DeDeCMS(织梦)相关文章调用优化</a></li>
+
+            </ul>
+          </div>
+        </div>
+		
+		<div class="hotlist br pt25">
+          <div class="h-t br">
+            <div class="t-text">最新文章</div>
+            <hr>
+          </div>
+          <div class="hotlist-bd br pt15">
+            <ul><li class="hot-1"><a href="/disarry/25.html" target="_blank" title="商品规格属性联动筛选实现方案">商品规格属性联动筛选实现方案</a></li>
+<li class="hot-2"><a href="/disarry/23.html" target="_blank" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-3"><a href="/disarry/22.html" target="_blank" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-4"><a href="/disarry/21.html" target="_blank" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-5"><a href="/disarry/20.html" target="_blank" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-6"><a href="/disarry/19.html" target="_blank" title="DeDeCMS文章分页聚合功能优化">DeDeCMS文章分页聚合功能优化</a></li>
+<li class="hot-7"><a href="/disarry/18.html" target="_blank" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+<li class="hot-8"><a href="/disarry/17.html" target="_blank" title="DeDeCMS(织梦)相关文章调用优化">DeDeCMS(织梦)相关文章调用优化</a></li>
+<li class="hot-9"><a href="/disarry/13.html" target="_blank" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-10"><a href="/disarry/11.html" target="_blank" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+
+            </ul>
+          </div>
+        </div>
+		
+		<div class="dspay br pt25">
+          <div class="h-t br">
+            <div class="t-text">打赏</div>
+            <hr>
+          </div>
+          <div class="dspay-bd pt15">
+			<img src="/skin/images/zfb.png" title="支付宝打赏二维码" class="zfb fl" />
+			<img src="/skin/images/wx.png" title="微信打赏二维码" class="wx fr" />
+          </div>
+        </div>
+	</div>
+</div>
+</div>
+<div class="f-warp pt25">
+<div class="footer">
+	<dl class="f-link fl">
+		<dt class="h-t">链接</dt>
+		<dd><a href="/about/">关于我</a></dd>
+		<dd><i class="ift icon-web"></i> 网站：https://imyme.cn</dd>
+
+	</dl>
+	<dl class="f-connect fl">
+		<dt class="h-t">联系我</dt>
+		<dd><i class="ift icon-tel"></i> TEL：</dd>
+		<dd><i class="ift icon-qq"></i> QQ：<a rel="nofollow" href="http://wpa.qq.com/msgrd?v=3&uin=857859975" target="_blank">857859975</a></dd>
+		<dd><i class="ift icon-phone"></i> Phone：</dd>
+		<dd><i class="ift icon-mail"></i> E-mail：admin@imyme.cn</dd>
+		<dd><a rel="nofollow" href="/plus/leave_a_message.php"><i class="ift icon-liuyan"></i></a> 或者<a href="/me/">登录</a>后给我<a rel="nofollow" href="/plus/leave_a_message.php">留言</a></dd>
+	</dl>
+	<div class="f-dspay fr">
+		<div class="imgbox fl"><img src="/skin/images/zfb.png" title="支付宝打赏二维码" class="zfb cl" /><span class="t">支付宝二维码</span></div>
+		<div class="imgbox fr"><img src="/skin/images/wx.png" title="微信打赏二维码" class="wx cl" /><span class="t">微信二维码</span></div>
+	</div>
+	<a id="go-top" href="javascript:void(0)" class="ift icon-top"></a>
+	<div class="copyright cl">&copy; 2010-2016 城子居（https://imyme.cn）版权所有  &nbsp;&nbsp;网站备案：<a href="http://www.miibeian.gov.cn/" rel="nofollow" >粤ICP备14066401号</a></div>
+</div>
+</div>
+<script type="text/javascript" src="https://ss1.bdstatic.com/5eN1bjq8AAUYm2zgoY3K/r/www/cache/static/protocol/https/jquery/jquery-1.10.2.min_f2fb5194.js"></script>
+<script type="text/javascript" src="/skin/js/config.js"></script>
+<script type="text/javascript">if(top != self){location.href = "https://imyme.cn";}</script>
+
+
+<script type="text/javascript" src="/skin/js/jquery.qrcode.min.js"></script>
+<script type="text/javascript">
+
+var a = 11;
+var t = "织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS";
+var f = "织梦集成上传至七牛云、阿里云OSS，集成功能包括：图集文件上传、文章图片上传。简单配置一键上传至七牛云或者阿里云OSS，节省服务器带宽，提升加载速度。";
+var ba ="https://imyme.cn";
+
+eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--)r[e(c)]=k[c]||e(c);k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('$(S).1p(6(){3 d=S.2v;3 c=\'i\'+\'m\'+\'y\'+\'m\'+\'e\'+\'.\'+\'c\'+\'n\';4(d!==c){$("2q").27()}3 g=a;3 h=9.X.H/2-22;3 i=9.X.F/2-1Z;3 j=t;3 k=$(".1V 1R").1d("1O");3 l=9.1k.1l;3 m="<a 1l=\\""+D+"\\">"+D+"</a>";3 n=f;6 11(a,b,c,d){9.M("19://1N.1b.1c/P/P.E?1M="+p(d)+"&1i="+p(a.1j(/&1L;/g," ").1j(/<1K \\/>/g," "))+"&I="+p(b),"P 1b","H=1J,F=Y,Z="+h+",10="+i+",1I=7,1H=7,15=7, 16=7,1k=7, 17=7")}6 18(a,b,c,d,e){9.M(\'19://1G.1F.1E.1c/1D-1C/1B/1y?1i=\'+p(a)+\'&I=\'+p(b)+\'&1w=\'+p(c)+\'&1v=\'+p(d),\'1u\',\'15=7,F=Y,H=1t,10=\'+i+\',Z=\'+h+\',17=7,16=1q\')}6 J(x){3 a=D+\'/V/21.E?1n=\'+g+\'&\'+x;3 b=$.W({I:a,1m:B});3 c=1r(\'(\'+b.1s+\')\');3 d=0;3 d=T(c.1g)+T(c.1f);$("#1x").z(c.1g);$("#1z").z(c.1f);$("#1A").z(d)}$("#R").w(6(){4(8("v")){3 a=8("v");4(a.O("|"+g+"|")>-1){u B}}J("R");L("v",g,C);$("#R").o().G("Q","#N")});$("#U").w(6(){4(8("v")){3 a=8("v");4(a.O("|"+g+"|")>-1){u B}}J("U");L("v",g,C);$("#U").o().G("Q","#N")});$("#1P").w(6(){11(j,l,m,k)});$("#1Q").w(6(){18(j,l,n,m,k)});$("#r").1S(6(){4($("#r").o().1T>0){$("#r").o().1U()}1a{$(\'#r\').r({F:12,H:12,z:l})}});$("#r").1W(6(){$("#r").o().1X()});J()});6 1Y(x,y,b){3 c=a;3 d=y;3 e=x;3 f=8(\'K\');3 g=20.1o(1e 23().24()/25);3 h=D+\'/V/26.E\';4(8(\'K\')){4(f.O("|"+d+"|")>-1){u B}}4(g-8(\'1h\')<5){28("29 2a!");u B}$.W({2b:\'2c\',I:h,2d:{\'1n\':c,\'2e\':d,\'2f\':e},1m:2g,2h:\'2i\'});L(\'K\',d,C);2j(\'1h\',g,C);b.G("Q","#N");3 i=b.o("i").z();i=T(i)+1;b.o("i").z(i)}(6(){3 c=2k;3 c=$("#2l");3 d=c.2m("i[2n=2o 2p-14]");3 f=c.1d("2r");d.G({2s:"2t"});c.2u(6(){3 a=c.A();4(a==f)c.A("")});3 g=1e 2w("^\\\\s*$","i");d.w(6(){3 a=c.A();3 b="/V/14.E?q=";4(a==f)u;4(!g.2x(a)){b+=a;9.M(b)}1a{c.A(f);u}});$(S).2y(6(e){4(!e)e=9.2z;4((e.2A||e.2B)==13){4(c.A()=="")u;d.w()}})})();',62,162,'|||var|if||function|no|GetCookie|window|||||||||||||||children|encodeURIComponent||qrcode|||return|gbpost|click|||text|val|false|31|ba|php|width|css|height|url|count|ffid|SetCookieStr|open|FF4400|indexOf|share|color|good|document|parseInt|bad|plus|ajax|screen|600|top|left|shareTSina|128||search|scrollbars|resizable|status|shareQzone|http|else|weibo|com|attr|new|badpost|goodpost|ptime|title|replace|location|href|async|aid|round|ready|yes|eval|responseText|450|_blank|site|summary|countgd|cgi_qzshare_onekey|countbd|content|qzshare|bin|cgi|qq|qzone|sns|menubar|toolbar|500|br|nbsp|pic|service|src|shwb|shqzone|img|mouseover|length|show|arctext|mouseout|hide|postBadGood|300|Math|fb_count|250|Date|getTime|1000|feedback|remove|alert|Too|Fast|type|POST|data|fid|stype|true|dataType|json|SetCookie|null|nSearch|next|class|ift|icon|body|placeholder|cursor|pointert|focus|domain|RegExp|test|keydown|event|keyCode|which'.split('|'),0,{}))
+
+</script>
+</body>
+</html>

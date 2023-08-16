@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>为什么DeDeCMS不安全？DeDeCMS后台安全性讨论_城子居</title>
+<meta name="keywords" content="DeDeCMS不安全,DeDeCMS安全设置,DeDeCMS安全优化,DeDeCMS后台安全性" />
+<meta name="description" content="很多人都说DeDeCMS不安全，但大多数人都没想过为什么DeDeCMS不安全？安全不是绝对的，站长在安全方面必须要有思考。下面说一些影响网站安全的行为和操作。" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<meta name="author" content="城子居">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=4.0, user-scalable=no"/m/>
+<meta name="format-detection"content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta http-equiv="Cache-Control" content="no-transform " />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<link rel="stylesheet" href="/m/skin/css/style_m.css" />
+</head>
+<body>
+<div id="header">
+	<div id="head">
+	<div class="logo fl"><a href="/m/">城子居</a></div>
+	<ul class="nav fl"><li><a href="/m/business/">商业</a></li><li><a href="/m/environment/">环境</a></li><li><a href="/m/uec/">UECenter</a></li><li><a href="/m/disarry/">杂谈</a></li><li><a href="/m/about/">关于博主</a></li>
+</ul>
+    <div class="user fr">
+      <div class="search fl">
+        <ul>
+          <li>
+            <form class="form-search" action="" onkeydown="if(event.keyCode==13){return false;}">
+              <input type="text" placeholder="输入搜索内容..." class="nav-search-input" id="nSearch">
+              <i class="ift icon-search"></i> 
+            </form>
+          </li>
+        </ul>
+      </div>
+		<div class="user_ico fr"><a href="/m/me/" rel="nofollow" class="ift icon-user" title="注册登录"></a><a class="ift icon-yejing" title="夜间模式"></a></div>
+	</div>
+  </div>
+</div> 
+<div class="warp">
+<div class="main">
+	<div id="content-left">
+	<div class="position fl"><i class="ift icon-home"></i> <a href='https://imyme.cn/'>主页</a> > <a href='/m/disarry/'>杂谈</a> > </div>
+	<h1 class="arc-h1 cl pt15">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</h1>
+	<div class="infoline"><div class="arcinfo"><span class="source">原创</span><span> / 2016-08-09 13:53</span></div>
+		<div class="share fr"><span id="shwb" class="ift icon-xlweibo"></span><span id="shqzone" class="ift icon-qzone"></span><div id="qrcode" class="ift icon-qrcode"></div><a href="https://imyme.cn/plus/feedback.php?aid=13"><span id="liuyan" class="ift icon-liuyan"></span><i id="content">…</i></a></div>
+	</div>
+<div class="description">很多人都说DeDeCMS不安全，但大多数人都没想过为什么DeDeCMS不安全？安全不是绝对的，站长在安全方面必须要有思考。下面说一些影响网站安全的行为和操作。...</div>
+	<div class="arc9494 arctext"><p>DeDeCMS安全性考虑不周，主要是没考虑到很多小白站长，一些小白站长的操作就是第六人般的存在，帮助骇客黑自己。如果站长在网站安全性上有考虑，基本就可以避免一些因为低级行为而导致的安全问题。我就拿dedecms网站后台来说一下安全问题。</p>
+
+<p style="text-align:center"><img alt="dedecms网站管理后台" src="//colyll.github.io/upload/image/1470721800_dedecms.png" /></p>
+
+<h2>网站后台被搜索引擎收录</h2>
+
+<p>对，没错。很多网站后台操作人员，在不经意间就把自己网站后台贴到前端显示出来了，而且还被蜘蛛收录了。这个问题对于公司最常见，很多人同时使用一个后台：①编辑为了给文章添加一张图片，把网站后台的预览地址贴了上去。②编辑为了加个链接，把后台文章的管理路径贴上去了。③在网站前端页面添加后台登录地址。</p>
+
+<p>处理方法：1.在服务器端对管理后台做访问限制，蜘蛛访问后台路径，返回404。2.如果公司是专线独立IP，可以对IP做访问限制。3.修改默认管理后台标题&ldquo;xxx内容管理系统&rdquo;，即使被收录，如果收录量大骇客也不一定能找到后台。4.不在任何位置泄露网站的后台地址。</p>
+
+<h2>网站后台出站链接问题</h2>
+
+<p>很多人看来，这没什么问题。其实这里暗藏非常大的危机，这里是暴露网站管理后台的重要地方。这些出站链接形式包括：①直接链接外网站点。②调用外网资源。③加载第三方广告、统计。④自动更新功能。⑤后台插件功能。写到这里，可能大家都知道了，你的网站后台dede官方是知道的。你应该还知道，dede官方更新服务器曾经被黑过。具体说下这些链接为什么会有泄漏网站后台的风险，一旦网站后台触发访问站外，就会留下一个http&nbsp;Referer头信息，这里面就会包含你的管理后台路径。上面这几种情况，除第①种需要点击触发之外，其他都是默认触发的。所以可见dedecms的后台管理路径是多么的脆弱。这个问题不只是dedecms存在，基本所有的web端管理后台，都有这样的问题。</p>
+
+<p>处理方法：1.禁止任何通过管理后台直接请求外网的行为。2.条件允许的情况下，对访问后台的IP做限制。3.如果非要请求外网，先过滤掉影响网站安全的数据。4.用插件前，先按照上面几点，排查下是否有请求外网数据的可能。</p>
+
+<h2>浏览器历史记录泄漏网站后台</h2>
+
+<p>这个很好理解了，主要是在别人的电脑上使用网站管理后台的时候需要注意。所以如果在不得已需要在别人电脑上登录网站管理后台的时候，退出之后，需要对浏览器进行清空缓存操作。</p>
+
+<h2>写在最后</h2>
+
+<p>看似安全的web后台，原来到处都是风险。所以安全行为很重要，也要很小心。关于dedecms安全性问题，我之前做了一些工作《<a href="https://imyme.cn/disarry/7.html" target="_blank">DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本</a>》，虽然织梦官方已经放出了php7.0的兼容性支持，但是对于有二次开发多的，php兼容性排查还是有价值的，而且此方案的一些安全脚本和操作，是很有价值的。</p>
+</div>
+	<div class="updown"><div id="good"><span class="ift icon-good"></span><span id="countgd">1</span></div><div id="bad"><span class="ift icon-trample"></span><span id="countbd">0</span></div></div>
+		<div class="same-bd br pt15">
+						<ul>
+						</ul>
+		</div>
+	<div class="banquan">
+		<p>本站原创内容请勿转载，因为这样大家可以聚集在这里讨论，请将本文链接分享给他/她!
+		</p>
+	</div>
+	<div class="content bl">
+		<div class="h-t bl pt25"><div class="t-text">文章讨论</div><hr></div>
+		<div class="content-bd bl pt15">
+		<ul>
+			</ul>
+		</div>
+	</div>
+	
+	<div class="same br pt25">
+		<div class="h-t br pt25">
+			<div class="t-text">延伸阅读</div>
+			<hr>
+		</div>
+		<div class="hotlist-bd br pt15">
+			<ul><li class="hot-1"><a href="/m/disarry/10.html" title="CKeditor七牛云JS SDK前端上传插件修改">CKeditor七牛云JS SDK前端上传插件修改</a></li>
+<li class="hot-2"><a href="/m/disarry/21.html" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-3"><a href="/m/disarry/23.html" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-4"><a href="/m/disarry/7.html" title="DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本">DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本</a></li>
+<li class="hot-5"><a href="/m/disarry/11.html" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+<li class="hot-6"><a href="/m/disarry/20.html" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-7"><a href="/m/disarry/22.html" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-8"><a href="/m/disarry/13.html" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-9"><a href="/m/disarry/18.html" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+<li class="hot-10"><a href="/m/disarry/17.html" title="DeDeCMS(织梦)相关文章调用优化">DeDeCMS(织梦)相关文章调用优化</a></li>
+
+			</ul>
+		</div>
+	</div>
+	</div>
+	<div id="content-right">
+		
+		<div class="hottag br pt25">
+          <div class="h-t br">
+            <div class="t-text">热门标签</div>
+            <hr>
+          </div>
+          <div class="hottag-bd br pt15">
+            <ul>
+<li><a href="/m/tags.php?/DeDeCMS%E4%B8%8D%E5%AE%89%E5%85%A8/" class="btn">DeDeCMS不安全</a></li>
+<li><a href="/m/tags.php?/DeDeCMS%E5%AE%89%E5%85%A8%E8%AE%BE%E7%BD%AE/" class="btn">DeDeCMS安全设置</a></li>
+<li><a href="/m/tags.php?/DeDeCMS%E5%AE%89%E5%85%A8%E4%BC%98%E5%8C%96/" class="btn">DeDeCMS安全优化</a></li>
+<li><a href="/m/tags.php?/DeDeCMS/" class="btn">DeDeCMS</a></li>
+            </ul>
+          </div>
+        </div>
+		
+		<div class="hotlist br pt25">
+          <div class="h-t br">
+            <div class="t-text">热文文章</div>
+            <hr>
+          </div>
+          <div class="hotlist-bd br pt15">
+            <ul><li class="hot-1"><a href="/m/disarry/10.html" title="CKeditor七牛云JS SDK前端上传插件修改">CKeditor七牛云JS SDK前端上传插件修改</a></li>
+<li class="hot-2"><a href="/m/disarry/21.html" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-3"><a href="/m/disarry/23.html" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-4"><a href="/m/disarry/7.html" title="DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本">DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本</a></li>
+<li class="hot-5"><a href="/m/disarry/11.html" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+<li class="hot-6"><a href="/m/disarry/20.html" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-7"><a href="/m/disarry/22.html" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-8"><a href="/m/disarry/13.html" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-9"><a href="/m/disarry/18.html" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+<li class="hot-10"><a href="/m/disarry/17.html" title="DeDeCMS(织梦)相关文章调用优化">DeDeCMS(织梦)相关文章调用优化</a></li>
+
+            </ul>
+          </div>
+        </div>
+		
+		<div class="hotlist br pt25">
+          <div class="h-t br">
+            <div class="t-text">最新文章</div>
+            <hr>
+          </div>
+          <div class="hotlist-bd br pt15">
+            <ul><li class="hot-1"><a href="/m/disarry/25.html" title="商品规格属性联动筛选实现方案">商品规格属性联动筛选实现方案</a></li>
+<li class="hot-2"><a href="/m/disarry/23.html" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-3"><a href="/m/disarry/22.html" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-4"><a href="/m/disarry/21.html" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-5"><a href="/m/disarry/20.html" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-6"><a href="/m/disarry/19.html" title="DeDeCMS文章分页聚合功能优化">DeDeCMS文章分页聚合功能优化</a></li>
+<li class="hot-7"><a href="/m/disarry/18.html" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+<li class="hot-8"><a href="/m/disarry/17.html" title="DeDeCMS(织梦)相关文章调用优化">DeDeCMS(织梦)相关文章调用优化</a></li>
+<li class="hot-9"><a href="/m/disarry/13.html" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-10"><a href="/m/disarry/11.html" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+
+            </ul>
+          </div>
+        </div>
+	</div>
+</div>
+</div>
+<div class="f-warp pt25">
+<div class="footer">
+	<div class="f-dspay fr">
+		<div class="imgbox fl"><img src="/m/skin/images/zfb.png" title="支付宝打赏二维码" class="zfb cl" /><span class="t">支付宝二维码</span></div>
+		<div class="imgbox fr"><img src="/m/skin/images/wx.png" title="微信打赏二维码" class="wx cl" /><span class="t">微信二维码</span></div>
+	</div>
+	<a id="go-top" href="javascript:void(0)" class="ift icon-top"></a>
+	<div class="copyright cl">&copy; 2010-2016 城子居（https://imyme.cn）版权所有  &nbsp;&nbsp;网站备案：<a href="http://www.miibeian.gov.cn/" rel="nofollow" >粤ICP备14066401号</a><a href="http://wpa.qq.com/msgrd?v=3&uin=857859975" rel="nofollow" target="_blank"><i class="ift icon-qq"></a></i>&nbsp;&nbsp;<a href="/m/about/">博主</a></div>
+</div>
+</div>
+<script type="text/javascript" src="https://ss1.bdstatic.com/5eN1bjq8AAUYm2zgoY3K/r/www/cache/static/protocol/https/jquery/jquery-1.10.2.min_f2fb5194.js"></script>
+<script type="text/javascript" src="/m/skin/js/config.js"></script>
+<script type="text/javascript">if(top != self){location.href = "about:blank";}</script>
+
+<div id="imgviewbox"><img id="imgview" src="" alt="" /><i id="close">x</i></div>
+<script type="text/javascript" async src="/m/skin/js/jquery.qrcode.min.js"></script>
+<script type="text/javascript">
+
+var a = 13;
+var t = "为什么DeDeCMS不安全？DeDeCMS后台安全性讨论";
+var f = "很多人都说DeDeCMS不安全，但大多数人都没想过为什么DeDeCMS不安全？安全不是绝对的，站长在安全方面必须要有思考。下面说一些影响网站安全的行为和操作。";
+var ba ="https://imyme.cn";
+
+var d = document.domain;
+var c = 'i' + 'm' + 'y' + 'm' + 'e' + '.' + 'c' + 'n';
+if (d !== c) {
+	$("body").remove()
+}
+$(window).load(function() {
+	var aid = a;
+	var top = window.screen.height / 2 - 250;
+	var left = window.screen.width / 2 - 300;
+	var title = t;
+	var pic = $(".arctext img").attr("src");
+	var rLink = window.location.href;
+	var site = "<a href=\"" + ba + "\">" + ba + "</a>";
+	var summary = f;
+
+	function shareTSina(title, rLink, site, pic) {
+		window.open("http://service.weibo.com/share/share.php?pic=" + encodeURIComponent(pic) + "&title=" + encodeURIComponent(title.replace(/&nbsp;/g, " ").replace(/<br \/>/g, " ")) + "&url=" + encodeURIComponent(rLink), "share weibo", "height=500,width=600,top=" + top + ",left=" + left + ",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no")
+	}
+	function shareQzone(title, rLink, summary, site, pic) {
+		window.open('http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?title=' + encodeURIComponent(title) + '&url=' + encodeURIComponent(rLink) + '&summary=' + encodeURIComponent(summary) + '&site=' + encodeURIComponent(site), '_blank', 'scrollbars=no,width=600,height=450,left=' + left + ',top=' + top + ',status=no,resizable=yes')
+	}
+	function count(x) {
+		var gourl = ba + '/m/plus/fb_count.php?aid=' + aid + '&' + x;
+		var getjson = $.ajax({
+			url: gourl,
+			async: false
+		});
+		var obj = eval('(' + getjson.responseText + ')');
+		var content = 0;
+		var content = parseInt(obj.goodpost) + parseInt(obj.badpost);
+		$("#countgd").text(obj.goodpost);
+		$("#countbd").text(obj.badpost);
+		$("#content").text(content)
+	}
+	$("#good").click(function() {
+		if (GetCookie("gbpost")) {
+			var str = GetCookie("gbpost");
+			if (str.indexOf("|" + aid + "|") > -1) {
+				return false
+			}
+		}
+		count("good");
+		SetCookieStr("gbpost", aid, 31);
+		$("#good").children().css("color", "#FF4400")
+	});
+	$("#bad").click(function() {
+		if (GetCookie("gbpost")) {
+			var str = GetCookie("gbpost");
+			if (str.indexOf("|" + aid + "|") > -1) {
+				return false
+			}
+		}
+		count("bad");
+		SetCookieStr("gbpost", aid, 31);
+		$("#bad").children().css("color", "#FF4400")
+	});
+	$("#shwb").click(function() {
+		shareTSina(title, rLink, site, pic)
+	});
+	$("#shqzone").click(function() {
+		shareQzone(title, rLink, summary, site, pic)
+	});
+	$("#qrcode").click(function() {
+		if ($("#qrcode").children().length > 0) {
+			$("#qrcode").children().show();
+			setTimeout('$("#qrcode").children().hide();', 5000)
+		} else {
+			$('#qrcode').qrcode({
+				width: 120,
+				height: 120,
+				text: rLink
+			});
+			setTimeout('$("#qrcode").children().hide();', 5000)
+		}
+	});
+	count();
+	(function() {
+		var nSearch = null;
+		var nSearch = $("#nSearch");
+		var but = nSearch.next("i[class=ift icon-search]");
+		var promptText = nSearch.attr("placeholder");
+		but.css({
+			cursor: "pointert"
+		});
+		nSearch.focus(function() {
+			var searchVal = nSearch.val();
+			if (searchVal == promptText) nSearch.val("")
+		});
+		var pattern = new RegExp("^\\s*$", "i");
+		but.click(function() {
+			var searchVal = nSearch.val();
+			var link = "/m/plus/search.php?q=";
+			if (searchVal == promptText) {
+				nSearch.show();
+				return
+			}
+			if (!pattern.test(searchVal)) {
+				link += searchVal;
+				window.open(link);
+				nSearch.hide();
+				nSearch.val(promptText)
+			} else {
+				nSearch.val(promptText);
+				nSearch.show();
+				return
+			}
+		});
+		$(document).keydown(function(e) {
+			if (!e) e = window.event;
+			if ((e.keyCode || e.which) == 13) {
+				if (nSearch.val() == "") return;
+				but.click()
+			}
+		})
+	})()
+})
+function postBadGood(x, y, obj) {
+	var aid = a;
+	var fid = y;
+	var stype = x;
+	var str = GetCookie('ffid');
+	var time = Math.round(new Date().getTime() / 1000);
+	var url = ba + '/m/plus/feedback.php';
+	if (GetCookie('ffid')) {
+		if (str.indexOf("|" + fid + "|") > -1) {
+			return false
+		}
+	}
+	if (time - GetCookie('ptime') < 5) {
+		alert("Too Fast!");
+		return false
+	}
+	$.ajax({
+		type: 'POST',
+		url: url,
+		data: {
+			'aid': aid,
+			'fid': fid,
+			'stype': stype
+		},
+		async: true,
+		dataType: 'json'
+	});
+	SetCookieStr('ffid', fid, 31);
+	SetCookie('ptime', time, 31);
+	obj.css("color", "#FF4400");
+	var tcont = obj.children("i").text();
+	tcont = parseInt(tcont) + 1;
+	obj.children("i").text(tcont)
+}
+$(".arctext").find("img").click(function() {
+	var imgurl = $(this)[0].src;
+	$("body").css({
+		"overflow": "hidden",
+		"margin-right": "10px"
+	});
+	$("#imgview").attr('src', imgurl);
+	$("#imgviewbox").css({
+		"display": "table-cell"
+	});
+	$("#imgview").css({
+		"position": "fixed",
+		"top": "40px",
+		"left": "0"
+	});
+	moveimg()
+});
+$("#imgviewbox").on('touchmove', function(event) {
+	event.stopPropagation()
+},false);
+$("#close").click(function() {
+	$("#imgview").attr('src', '');
+	$("body").css({
+		"overflow": "auto",
+		"margin-right": "0"
+	});
+	$("#imgviewbox").css({
+		"display": "none"
+	});
+	$("#imgview").removeAttr('width');
+	$("#imgview").removeAttr('height')
+});
+$("#imgview").click(function() {
+	var nw = $(this)[0].naturalWidth;
+	var nh = $(this)[0].naturalHeight;
+	$(this).css({
+		"position": "fixed",
+		"top": "40px",
+		"left": "0"
+	});
+	if ($("#imgview").attr('width') > nw) {
+		$("#imgview").attr('width', nw);
+		$("#imgview").attr('height', nh)
+	} else {
+		$("#imgview").attr('width', nw * 2);
+		$("#imgview").attr('height', nh * 2)
+	}
+});
+
+function moveimg() {
+	var t_startY;
+	var t_startX;
+	var m_startX;
+	var m_startY;
+
+	function touchStart(e) {
+		var touches = e.changedTouches;
+		var	l = touches.length;
+		var	touch;
+		if (l = 1) {
+			touch = touches[0];
+			t_startY = touch.pageY;
+			t_startX = touch.pageX;
+			m_startY = parseInt($(this).css('top'));
+			m_startX = parseInt($(this).css('left'))
+		}
+	}
+	function touchMove(e) {
+		var touches = e.targetTouches;
+		var	l = touches.length;
+		var	touch;
+		if (l = 1) {
+			touch = touches[0];
+			var move_y = touch.pageY - t_startY;
+			var move_x = touch.pageX - t_startX;
+			var x = m_startX + move_x;
+			var y = m_startY + move_y;
+			$(this).css({
+				"top": y,
+				"left": x
+			})
+		}
+	}
+	document.getElementById("imgview").addEventListener("touchstart", touchStart, false);
+	document.getElementById("imgview").addEventListener("touchmove", touchMove, false)
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>商品规格属性联动筛选实现方案_城子居</title>
+<meta name="keywords" content="商品规格属性筛选方案,商品规格属性联动筛选" />
+<meta name="description" content="商品规格属性多级联动筛选是最基础的功能，因为自己需要一个，在网上也没有找到可用的，所以干脆就自己梳理了下，模仿淘宝商品属性筛选写了一个。" />
+<meta name="author" content="城子居">
+<meta http-equiv="Cache-Control" content="no-transform " />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<link rel="stylesheet" href="/skin/css/style.css" />
+</head>
+<body>
+<div class="headerbg"><div id="header">
+	<div id="head">
+	<div class="logo fl"><a href="/">城子居</a></div>
+	<ul class="nav fl"><li><a href="/business/">商业</a></li><li><a href="/environment/">环境</a></li><li><a href="/uec/">UECenter</a></li><li><a href="/disarry/">杂谈</a></li><li><a href="/about/">关于博主</a></li>
+</ul>
+    <div class="user fr">
+      <div class="search fl">
+        <ul>
+          <li>
+            <form class="form-search" action="" onkeydown="if(event.keyCode==13){return false;}">
+              <input type="text" placeholder="输入搜索内容..." class="nav-search-input" id="nSearch">
+              <i class="ift icon-search"></i> 
+            </form>
+          </li>
+        </ul>
+      </div>
+		<div class="user_ico fr"><a href="/me/" rel="nofollow" class="ift icon-user" title="注册登录"></a><a class="ift icon-yejing" title="夜间模式"></a></div>
+	</div>
+  </div>
+</div></div>
+ 
+<div class="warp">
+<div class="main">
+	<div id="content-left">
+	<div class="position fl"><i class="ift icon-home"></i> <a href='https://imyme.cn/'>主页</a> > <a href='/disarry/'>杂谈</a> > </div>
+	<h1 class="arc-h1 cl pt25">商品规格属性联动筛选实现方案</h1>
+	<div class="infoline"><div class="arcinfo"><span class="source">来源：未知</span><span>城子居 / 2019-01-01 21:53</span></div>
+		<div class="share fr"><span id="shwb" class="ift icon-xlweibo"></span><span id="shqzone" class="ift icon-qzone"></span><div id="qrcode" class="ift icon-qrcode"></div><a href="https://imyme.cn/plus/feedback.php?aid=25" target="_blank"><span id="liuyan" class="ift icon-liuyan"></span><i id="content">…</i></a></div>
+	</div>
+<div class="description mt15">商品规格属性多级联动筛选是最基础的功能，因为自己需要一个，在网上也没有找到可用的，所以干脆就自己梳理了下，模仿淘宝商品属性筛选写了一个。...</div>
+	<div class="arc9494 arctext"><p>商品规格属性多级联动筛选是最基础的功能，自己在开发商城的时候也遇到了这样的问题，我们是一个很小的商城，小到甚至分不到公司的产品规划资源，运营在哪里见过某种功能，或者想要某种功能，我直接评估就直接开发（也就是传说中的敏捷开发）。当然，这个商品规格属性筛选功能已经有很多成熟案例，比如淘宝的商品规格属性筛选功能，行业模范和标准。</p>
+
+<p style="text-align:center"><img class="lazy" data-original="//colyll.github.io/upload/image/1546350832772_01.png" src="//colyll.github.io/upload/image/1546350832772_01.png" style="width:100%;"/><br />
+PC前端展示规格筛选页面</p>
+
+<h2>商品规格筛选实现逻辑</h2>
+
+<p>1.页面加载时，输出规格属性元素列表，属性元素绑定函数（上图就是PC端页面输出）。<br />
+2.页面加载完成时，请求SKU数据（sku ID，sku代码，对应图片，活动价格，售价，市场价，库存数量，规格组成元素）。<br />
+3.处理获得的请求数据（缓存、sku数据格式化、简化数据、规格属性组，属性点，选中属性组）。<br />
+4.规格属性状态计算（可选和不可选）。<br />
+5.赋值（把计算结果赋予页面表现上）。</p>
+
+<h2>第3步处理后的数据结构展示：</h2>
+
+<p style="text-align:center"><img class="lazy" data-original="//colyll.github.io/upload/image/1546353609193_04.png" src="//colyll.github.io/upload/image/1546353609193_04.png" style="width:100%;" /></p>
+
+<h2>第4步商品规格属性状态计算逻辑代码</h2>
+
+<p>以下就是第4步的计算代码，经过验证的。核心计算逻辑：a.最先请求到库存之后，初始化设置不可选中的属性点，并且记录。b.根据当前选中的属性点来计算下一步可选、不可选的状态（当前未选中点，即为初始化操作）。c.通过其他非当前列来计算当前列的所有属性点状态(计算前，先全设置为不可选，计算获得可选)。</p>
+
+<pre>
+<em class="language">JavaScript</em><code class="language-javascript">function check_attr(name) {
+    var time = Math.round(new Date().getTime()/1000); //当前时间
+
+    //缓存库存在有效期内
+    if(goodsDepot.time &amp;&amp; time &lt; goodsDepot.time){
+        //处理点击的属性
+        if(name){
+            goodsDepot.dot[name].status = goodsDepot.dot[name].status == 1 ? 0 : 1;  //修改dot的选中状态
+            if(goodsDepot.dot[name].status == 1){
+                goodsDepot.columnSelected[goodsDepot.dot[name].column] = name; //记录已选中的
+                for(var i=0; i &lt; goodsDepot.column[goodsDepot.dot[name].column].length; i++){
+                    if(goodsDepot.column[goodsDepot.dot[name].column][i] != name &amp;&amp; goodsDepot.dot[goodsDepot.column[goodsDepot.dot[name].column][i]].status == 1){
+                        goodsDepot.dot[goodsDepot.column[goodsDepot.dot[name].column][i]].status = 0
+                    }
+                }
+            } else {
+                goodsDepot.columnSelected[goodsDepot.dot[name].column] = 0;
+            }
+        }
+
+        //依照选中的属性计算
+        var select_count = eval(goodsDepot.columnSelected.join('+'));
+        if(select_count &gt; 0){
+            for(var i = 1; i &lt; goodsDepot.columnSelected.length; i++){
+                var nowDepot = JSON.parse(JSON.stringify(goodsDepot.attrData)); //复制一份简版sku集合
+                for(var j = 1; j &lt; goodsDepot.columnSelected.length; j++){
+                    if(i != j &amp;&amp; goodsDepot.columnSelected[j] &gt; 0){
+                        for(var k = nowDepot.length -1; k &gt;= 0; k--){
+                            if(nowDepot[k][j] != goodsDepot.columnSelected[j]){
+                                nowDepot.splice(k,1);
+                            }
+                        }
+                    }
+                }
+
+                for(var l = 0; l &lt;  goodsDepot.column[i].length; l++ ){
+                    //默认设置为不可点击，下一步查询库存再打开
+                    if(goodsDepot.columnSelected[i] != goodsDepot.column[i][l]){
+                        goodsDepot.dot[goodsDepot.column[i][l]].status = -1;
+                    }
+                    for(var m = 0; m &lt; nowDepot.length; m++){
+                        if(goodsDepot.column[i][l] == nowDepot[m][i] &amp;&amp; goodsDepot.data[nowDepot[m][0]].productNumber &gt; 0 &amp;&amp; goodsDepot.column[i][l] != goodsDepot.columnSelected[i]){
+                            //查询到库存大于0，设置为可点击。
+                            goodsDepot.dot[goodsDepot.column[i][l]].status = 0;
+                        }
+                    }
+                }
+
+                for(var x = 0; x &lt; goodsDepot.column[i].length; x++){
+                    switch (goodsDepot.dot[goodsDepot.column[i][x]].status){
+                        case 1:
+                            attr_select(goodsDepot.column[i][x]);
+                            break;
+                        case 0:
+                            attr_can_select(goodsDepot.column[i][x]);
+                            break;
+                        case -1:
+                            attr_disable(goodsDepot.column[i][x]);
+                            break;
+                    }
+                }
+            }
+        } else {
+            for(var i in goodsDepot.dot){
+                if(goodsDepot.dot[i].count &gt; goodsDepot.dot[i].count_tmp){
+                    //设置为可选
+                    attr_can_select(goodsDepot.dot[i].name);
+                } else {
+                    //设置为不可选
+                    attr_disable(goodsDepot.dot[i].name);
+                }
+            }
+        }
+    }else{
+        get_Attr();
+        check_attr(name);
+    }
+}</code></pre>
+
+<h2>选中效果展示：</h2>
+
+<p>1.初始化，未选中任何点（即首图的状态）。<br />
+2.选中一个点的状态。</p>
+
+<p style="text-align:center"><img class="lazy" data-original="//colyll.github.io/upload/image/1546352834324_02.png" src="//colyll.github.io/upload/image/1546352834324_02.png" /></p>
+
+<p>3.选中两个点的状态。</p>
+
+<p style="text-align:center"><img class="lazy" data-original="//colyll.github.io/upload/image/1546352857754_03.png" src="//colyll.github.io/upload/image/1546352857754_03.png" /></p>
+
+<p>4.移动端样式事例。</p>
+
+<p style="text-align:center"><img class="lazy" data-original="//colyll.github.io/upload/image/1546352902105_05.png" src="//colyll.github.io/upload/image/1546352902105_05.png" /></p>
+
+<h2>写在最后</h2>
+
+<p>写这个方案之前，考虑过使用正则来实现规格搜索，即把每个点转换成单个字符，然后通过拼凑正则查询语句来对比sku库存，这样可以简化手动搜索属性点的复杂度，但是后来一想省不了事就作罢了，因为后台不可避免的需要维护单个属性点对应单个字符的储存顺序，前端把属性内容表现出来的时候，还是需要手动处理sku数据。因为前端后端都是自己一个人的事，这就只能一点点处理数据了。</p>
+</div>
+	<div class="updown"><div id="good"><span class="ift icon-good"></span><span id="countgd">7</span></div><div id="bad"><span class="ift icon-trample"></span><span id="countbd">0</span></div></div>
+
+        <div class="same-bd br pt15">
+                        <ul>
+                        </ul>
+        </div>
+
+	<div class="banquan">
+		<p>本站原创内容请勿转载，因为这样大家可以聚集在这里讨论，请将本文链接分享给他/她! <br>
+		</p>
+	</div>
+	
+	<div class="content bl">
+		<div class="h-t bl pt25"><div class="t-text">文章讨论</div><hr></div>
+		<div class="content-bd bl pt15">
+		<ul><li class="conmsg bl">
+<img class="headimg" src="/skin/images/dfuser.png"  height='40' width='40'/>
+<div class="title"><span class="name" title="用户ID：<?php echo $fields['userid'];?>"></span><span class="time">2019-08-05 11:32:46</span><span class="jbao">举报</span></div>
+<div class="msg">
+<p class="text">请问博主有源码可以参考吗？</p>
+<span class="b"><a class="ift icon-good" onclick="postBadGood('goodfb',1,$(this));"><i></i></a><a class="ift icon-trample" onclick="postBadGood('badfb',1,$(this));"><i></i></a><!-- <a class="ift" id="tomsg">&#xe631;</a> --></span>
+</div>
+</li>
+			</ul>
+		</div>
+	</div>
+	
+	<div class="same br pt25">
+		<div class="h-t br pt25">
+			<div class="t-text">延伸阅读</div>
+			<hr>
+		</div>
+		<div class="same-bd br pt15">
+			<ul>
+			</ul>
+		</div>
+	</div>
+	</div>
+	<div id="content-right">
+		
+		<div class="hottag br pt25">
+          <div class="h-t br">
+            <div class="t-text">热门标签</div>
+            <hr>
+          </div>
+          <div class="hottag-bd br pt15">
+            <ul>
+            </ul>
+          </div>
+        </div>
+		
+		<div class="hotlist br pt25">
+          <div class="h-t br">
+            <div class="t-text">热文文章</div>
+            <hr>
+          </div>
+          <div class="hotlist-bd br pt15">
+            <ul><li class="hot-1"><a href="/disarry/10.html" target="_blank" title="CKeditor七牛云JS SDK前端上传插件修改">CKeditor七牛云JS SDK前端上传插件修改</a></li>
+<li class="hot-2"><a href="/disarry/21.html" target="_blank" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-3"><a href="/disarry/23.html" target="_blank" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-4"><a href="/disarry/7.html" target="_blank" title="DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本">DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本</a></li>
+<li class="hot-5"><a href="/disarry/11.html" target="_blank" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+<li class="hot-6"><a href="/disarry/20.html" target="_blank" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-7"><a href="/disarry/22.html" target="_blank" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-8"><a href="/disarry/13.html" target="_blank" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-9"><a href="/disarry/25.html" target="_blank" title="商品规格属性联动筛选实现方案">商品规格属性联动筛选实现方案</a></li>
+<li class="hot-10"><a href="/disarry/18.html" target="_blank" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+
+            </ul>
+          </div>
+        </div>
+		
+		<div class="hotlist br pt25">
+          <div class="h-t br">
+            <div class="t-text">最新文章</div>
+            <hr>
+          </div>
+          <div class="hotlist-bd br pt15">
+            <ul><li class="hot-1"><a href="/disarry/25.html" target="_blank" title="商品规格属性联动筛选实现方案">商品规格属性联动筛选实现方案</a></li>
+<li class="hot-2"><a href="/disarry/23.html" target="_blank" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-3"><a href="/disarry/22.html" target="_blank" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-4"><a href="/disarry/21.html" target="_blank" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-5"><a href="/disarry/20.html" target="_blank" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-6"><a href="/disarry/19.html" target="_blank" title="DeDeCMS文章分页聚合功能优化">DeDeCMS文章分页聚合功能优化</a></li>
+<li class="hot-7"><a href="/disarry/18.html" target="_blank" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+<li class="hot-8"><a href="/disarry/17.html" target="_blank" title="DeDeCMS(织梦)相关文章调用优化">DeDeCMS(织梦)相关文章调用优化</a></li>
+<li class="hot-9"><a href="/disarry/13.html" target="_blank" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-10"><a href="/disarry/11.html" target="_blank" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+
+            </ul>
+          </div>
+        </div>
+		
+		<div class="dspay br pt25">
+          <div class="h-t br">
+            <div class="t-text">打赏</div>
+            <hr>
+          </div>
+          <div class="dspay-bd pt15">
+			<img src="/skin/images/zfb.png" title="支付宝打赏二维码" class="zfb fl" />
+			<img src="/skin/images/wx.png" title="微信打赏二维码" class="wx fr" />
+          </div>
+        </div>
+	</div>
+</div>
+</div>
+<div class="f-warp pt25">
+<div class="footer">
+	<dl class="f-link fl">
+		<dt class="h-t">链接</dt>
+		<dd><a href="/about/">关于我</a></dd>
+		<dd><i class="ift icon-web"></i> 网站：https://imyme.cn</dd>
+
+	</dl>
+	<dl class="f-connect fl">
+		<dt class="h-t">联系我</dt>
+		<dd><i class="ift icon-tel"></i> TEL：</dd>
+		<dd><i class="ift icon-qq"></i> QQ：<a rel="nofollow" href="http://wpa.qq.com/msgrd?v=3&uin=857859975" target="_blank">857859975</a></dd>
+		<dd><i class="ift icon-phone"></i> Phone：</dd>
+		<dd><i class="ift icon-mail"></i> E-mail：admin@imyme.cn</dd>
+		<dd><a rel="nofollow" href="/plus/leave_a_message.php"><i class="ift icon-liuyan"></i></a> 或者<a href="/me/">登录</a>后给我<a rel="nofollow" href="/plus/leave_a_message.php">留言</a></dd>
+	</dl>
+	<div class="f-dspay fr">
+		<div class="imgbox fl"><img src="/skin/images/zfb.png" title="支付宝打赏二维码" class="zfb cl" /><span class="t">支付宝二维码</span></div>
+		<div class="imgbox fr"><img src="/skin/images/wx.png" title="微信打赏二维码" class="wx cl" /><span class="t">微信二维码</span></div>
+	</div>
+	<a id="go-top" href="javascript:void(0)" class="ift icon-top"></a>
+	<div class="copyright cl">&copy; 2010-2016 城子居（https://imyme.cn）版权所有  &nbsp;&nbsp;网站备案：<a href="http://www.miibeian.gov.cn/" rel="nofollow" >粤ICP备14066401号</a></div>
+</div>
+</div>
+<script type="text/javascript" src="https://ss1.bdstatic.com/5eN1bjq8AAUYm2zgoY3K/r/www/cache/static/protocol/https/jquery/jquery-1.10.2.min_f2fb5194.js"></script>
+<script type="text/javascript" src="/skin/js/config.js"></script>
+<script type="text/javascript">if(top != self){location.href = "https://imyme.cn";}</script>
+
+
+<script type="text/javascript" src="/skin/js/jquery.qrcode.min.js"></script>
+<script type="text/javascript">
+
+var a = 25;
+var t = "商品规格属性联动筛选实现方案";
+var f = "商品规格属性多级联动筛选是最基础的功能，因为自己需要一个，在网上也没有找到可用的，所以干脆就自己梳理了下，模仿淘宝商品属性筛选写了一个。";
+var ba ="https://imyme.cn";
+
+eval(function(p,a,c,k,e,r){e=function(c){return(c<a?'':e(parseInt(c/a)))+((c=c%a)>35?String.fromCharCode(c+29):c.toString(36))};if(!''.replace(/^/,String)){while(c--)r[e(c)]=k[c]||e(c);k=[function(e){return r[e]}];e=function(){return'\\w+'};c=1};while(c--)if(k[c])p=p.replace(new RegExp('\\b'+e(c)+'\\b','g'),k[c]);return p}('$(S).1p(6(){3 d=S.2v;3 c=\'i\'+\'m\'+\'y\'+\'m\'+\'e\'+\'.\'+\'c\'+\'n\';4(d!==c){$("2q").27()}3 g=a;3 h=9.X.H/2-22;3 i=9.X.F/2-1Z;3 j=t;3 k=$(".1V 1R").1d("1O");3 l=9.1k.1l;3 m="<a 1l=\\""+D+"\\">"+D+"</a>";3 n=f;6 11(a,b,c,d){9.M("19://1N.1b.1c/P/P.E?1M="+p(d)+"&1i="+p(a.1j(/&1L;/g," ").1j(/<1K \\/>/g," "))+"&I="+p(b),"P 1b","H=1J,F=Y,Z="+h+",10="+i+",1I=7,1H=7,15=7, 16=7,1k=7, 17=7")}6 18(a,b,c,d,e){9.M(\'19://1G.1F.1E.1c/1D-1C/1B/1y?1i=\'+p(a)+\'&I=\'+p(b)+\'&1w=\'+p(c)+\'&1v=\'+p(d),\'1u\',\'15=7,F=Y,H=1t,10=\'+i+\',Z=\'+h+\',17=7,16=1q\')}6 J(x){3 a=D+\'/V/21.E?1n=\'+g+\'&\'+x;3 b=$.W({I:a,1m:B});3 c=1r(\'(\'+b.1s+\')\');3 d=0;3 d=T(c.1g)+T(c.1f);$("#1x").z(c.1g);$("#1z").z(c.1f);$("#1A").z(d)}$("#R").w(6(){4(8("v")){3 a=8("v");4(a.O("|"+g+"|")>-1){u B}}J("R");L("v",g,C);$("#R").o().G("Q","#N")});$("#U").w(6(){4(8("v")){3 a=8("v");4(a.O("|"+g+"|")>-1){u B}}J("U");L("v",g,C);$("#U").o().G("Q","#N")});$("#1P").w(6(){11(j,l,m,k)});$("#1Q").w(6(){18(j,l,n,m,k)});$("#r").1S(6(){4($("#r").o().1T>0){$("#r").o().1U()}1a{$(\'#r\').r({F:12,H:12,z:l})}});$("#r").1W(6(){$("#r").o().1X()});J()});6 1Y(x,y,b){3 c=a;3 d=y;3 e=x;3 f=8(\'K\');3 g=20.1o(1e 23().24()/25);3 h=D+\'/V/26.E\';4(8(\'K\')){4(f.O("|"+d+"|")>-1){u B}}4(g-8(\'1h\')<5){28("29 2a!");u B}$.W({2b:\'2c\',I:h,2d:{\'1n\':c,\'2e\':d,\'2f\':e},1m:2g,2h:\'2i\'});L(\'K\',d,C);2j(\'1h\',g,C);b.G("Q","#N");3 i=b.o("i").z();i=T(i)+1;b.o("i").z(i)}(6(){3 c=2k;3 c=$("#2l");3 d=c.2m("i[2n=2o 2p-14]");3 f=c.1d("2r");d.G({2s:"2t"});c.2u(6(){3 a=c.A();4(a==f)c.A("")});3 g=1e 2w("^\\\\s*$","i");d.w(6(){3 a=c.A();3 b="/V/14.E?q=";4(a==f)u;4(!g.2x(a)){b+=a;9.M(b)}1a{c.A(f);u}});$(S).2y(6(e){4(!e)e=9.2z;4((e.2A||e.2B)==13){4(c.A()=="")u;d.w()}})})();',62,162,'|||var|if||function|no|GetCookie|window|||||||||||||||children|encodeURIComponent||qrcode|||return|gbpost|click|||text|val|false|31|ba|php|width|css|height|url|count|ffid|SetCookieStr|open|FF4400|indexOf|share|color|good|document|parseInt|bad|plus|ajax|screen|600|top|left|shareTSina|128||search|scrollbars|resizable|status|shareQzone|http|else|weibo|com|attr|new|badpost|goodpost|ptime|title|replace|location|href|async|aid|round|ready|yes|eval|responseText|450|_blank|site|summary|countgd|cgi_qzshare_onekey|countbd|content|qzshare|bin|cgi|qq|qzone|sns|menubar|toolbar|500|br|nbsp|pic|service|src|shwb|shqzone|img|mouseover|length|show|arctext|mouseout|hide|postBadGood|300|Math|fb_count|250|Date|getTime|1000|feedback|remove|alert|Too|Fast|type|POST|data|fid|stype|true|dataType|json|SetCookie|null|nSearch|next|class|ift|icon|body|placeholder|cursor|pointert|focus|domain|RegExp|test|keydown|event|keyCode|which'.split('|'),0,{}))
+
+</script>
+</body>
+</html>

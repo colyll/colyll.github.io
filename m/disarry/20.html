@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>新版CKeditor七牛云插件修改_城子居</title>
+<meta name="keywords" content="CKeditor图片服务器,七牛云CKeditor插件" />
+<meta name="description" content="之前写的《CKeditor七牛云JS SDK前端上传插件修改》是没有优化压缩过的，而且在返回图片地址的时候，有点问题没处理好。这里新优化了一下，做了一个新的CKeditor七牛云上传插件。" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<meta name="author" content="城子居">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=4.0, user-scalable=no"/m/>
+<meta name="format-detection"content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<meta http-equiv="Cache-Control" content="no-transform " />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+<link rel="stylesheet" href="/m/skin/css/style_m.css" />
+</head>
+<body>
+<div id="header">
+	<div id="head">
+	<div class="logo fl"><a href="/m/">城子居</a></div>
+	<ul class="nav fl"><li><a href="/m/business/">商业</a></li><li><a href="/m/environment/">环境</a></li><li><a href="/m/uec/">UECenter</a></li><li><a href="/m/disarry/">杂谈</a></li><li><a href="/m/about/">关于博主</a></li>
+</ul>
+    <div class="user fr">
+      <div class="search fl">
+        <ul>
+          <li>
+            <form class="form-search" action="" onkeydown="if(event.keyCode==13){return false;}">
+              <input type="text" placeholder="输入搜索内容..." class="nav-search-input" id="nSearch">
+              <i class="ift icon-search"></i> 
+            </form>
+          </li>
+        </ul>
+      </div>
+		<div class="user_ico fr"><a href="/m/me/" rel="nofollow" class="ift icon-user" title="注册登录"></a><a class="ift icon-yejing" title="夜间模式"></a></div>
+	</div>
+  </div>
+</div> 
+<div class="warp">
+<div class="main">
+	<div id="content-left">
+	<div class="position fl"><i class="ift icon-home"></i> <a href='https://imyme.cn/'>主页</a> > <a href='/m/disarry/'>杂谈</a> > </div>
+	<h1 class="arc-h1 cl pt15">新版CKeditor七牛云插件修改</h1>
+	<div class="infoline"><div class="arcinfo"><span class="source">原创</span><span> / 2016-12-05 15:32</span></div>
+		<div class="share fr"><span id="shwb" class="ift icon-xlweibo"></span><span id="shqzone" class="ift icon-qzone"></span><div id="qrcode" class="ift icon-qrcode"></div><a href="https://imyme.cn/plus/feedback.php?aid=20"><span id="liuyan" class="ift icon-liuyan"></span><i id="content">…</i></a></div>
+	</div>
+<div class="description">之前写的《CKeditor七牛云JS SDK前端上传插件修改》是没有优化压缩过的，而且在返回图片地址的时候，有点问题没处理好。这里新优化了一下，做了一个新的CKeditor七牛云上传插件。...</div>
+	<div class="arc9494 arctext"><p>新版CKeditor七牛云插件修改基于，CKeditor 4.6的源码，CKeditor新版支持从word复制内容直接上传了（IE9+），所以不需要之前的imagepaste老插件了。本来打算对上传的文件名做一个修改，避免同时拖入大量文件，导致文件名相同覆盖的情况，考虑到之前使用的是：Uinx时间戳_原文件名的方式，所以默认还是不修改。很多人觉得文件名对搜索引擎排名有提权作用，其实可以说是基本没有的，所以不用纠结文件名的问题。</p><p style="text-align:center"><img alt="新版CKeditor 4.6七牛云插件修改" data-original="//colyll.github.io/upload/image/1468327246_ckeditor_to_qiniu.jpg" src="//colyll.github.io/upload/image/1468327246_ckeditor_to_qiniu.jpg" class="lazy" /></p><h2>新版的改动</h2><p>1、升级到CKeditor 4.6源码，并且保留了CKeditor的原来功能。<br />2、压缩了文件，主要针对使用http的友好了一些。<br />3、优化了下配置方式，之前需要输入很多的环境参数，现在只需要在config.js里配置就可以了。<br />4、配合JQuery lazylaod插件做了一些图片加载优化配置，还需要后台配合。<br />5、修复了一个Bug，之前可能一些浏览器有上传成功，但是获取图片地址是失败的情况，现在修复了。<br />6、其他第一版本有的优点，还是有的，第一版：《<a target="_blank" href="https://imyme.cn/disarry/10.html">CKeditor七牛云JS SDK前端上传插件修改</a>》。</p><h2>环境初始化和配置</h2><p>1.初始化之前需要服务器输出上传的uptoken (或者在config.js里配置config.qiniuUptokenUrl)，当然像下面这样直接输出一个uptoken优先级高。</p><pre><em class="language">JavaScript</em><code class="language-javascript">&lt;script type="text/javascript"&gt;
+	var qiniu_uptoken='xx___your_uptoken___xxx';  //七牛云服务端生成的uptoken
+&lt;/script&gt;</code></pre><p>2.在config.js里配置。</p><pre><em class="language">JavaScript</em><code class="language-javascript">	config.extraPlugins = 'uploadimage'; // 拖拽、黏贴上传扩展，有的后台程序对编辑加载参数进行了封装的，需要自己修改程序，可能加载不到这里的扩展配置。
+	// Save images to Qiniu. If seted saveto, must be set: qiniuBucketDomain
+	// If use uptoken, well not use config.qiniuUptokenUrl
+	config.saveto = 'qiniu';  //对于于插件里的判断值。
+	config.qiniuBucketDomain = 'https://img.imyme.cn';  //自定义的Bucket域名。
+	config.qiniuUploadDomain = 'http://upload.qiniu.com'; //北方网通、https情况，请自己修改。
+	config.qiniuUptokenUrl = '/m/uptoken';   //优先级低于直接输出uptoken
+	
+	// Images use lazyload. If seted lazyload, must be set: lazyloadattribute, config.extraAllowedContent
+	// config.lazyload = true;  //需要后台程序配合处理图片url，默认不开启，需要的自行修改。
+	config.lazyloadImg = '/m/skin/images/logo.png'; //目前没有意义。
+	config.lazyloadAttribute = 'data-original';  //图片真实地址。
+	config.lazyloadCss = 'lazy';   //图片css类名
+	config.extraAllowedContent = 'img[data-original]'; //lazyloadAttribute上设置的属性。</code></pre><p>输出七牛云uptoken和配置好参数之后，引入七牛云qiniu.min.js和plupload.full.js之后，就可以加载编辑器了。</p><pre><em class="language">HTML</em><code class="language-html">&lt;script src="../js/plupload.full.min.js"&gt;&lt;/script&gt;
+&lt;script src="../js/qiniu.min.js"&gt;&lt;/script&gt;
+&lt;script src="../ckeditor/ckeditor.js"&gt;&lt;/script&gt;</code></pre><h2>相对CKeditor 4.6官方源码，修改的地方</h2><p>1.config.js (把大部分配置加入到了这里)<br />2.plugin/dialog/plugin.js&nbsp;(解决图片对话框Tab的disabled激活问题，暂时先这样用着)<br />3.plugin/image/dialog/image.js&nbsp;(图片对话框上传，之前是copy了一份修改，新版融入到原来的js文件里了，解决一个小bug)<br />4.plugin/filetools/plugin.js&nbsp;(拖拽上传、黏贴上传处理相关)<br />5.plugin/filebrowser/plugin.js&nbsp;(对话框上传图片地址返回处理)<br />6.plugin/uplodimage/plugin.js&nbsp;(拖拽上传、黏贴上传处理)<br />因为是压缩优化过的，所以就不贴具体代码了。如果真有人需要没压缩版本，自己修改的话，我再把源码贴到网盘。</p><h2>图片的lazyload问题</h2><p>考虑到有些图片质量比较大，需要编辑器配合后台做一些修改。配置文件里的config.lazyload = true;打开的时候，图片上传的时候会加上一个配置的css类名和缓存数据属性字段，特别的需要配置config.extraAllowedContent，因为是非标准属性，默认会被CKeditor过滤掉。config.lazyloadImg现在是没有意义的，本来打算在CKeditor里把图片默认的src地址也处理掉，但是这里会影响编辑的时候图片显示，而且切换源码的时候还得来回替换，非常累赘。所以目前把图片src放到后台程序处理，再配合JQuery lazylaod插件使用。</p><h2>写在最后</h2><p>1、我把新版文件也放在原来的地方，方便有收藏的人看到更新。<br />2、如果是dedecms之类需要拖拽上传、黏贴上传功能的，需要确定编辑器正常加载了uplodimage插件，可能需要修改dedecms程序，否者会导致功能不可用。<br />3、其实优化版跟无压缩版本来说，节省的请求数量多，其他没有多大的差距，特别是无压缩版本也删掉了注释、服务器开启了js压缩的情况下。正式环境中的samples文件夹可以删掉。<br />最后，由于时间和精力的关系，我不提供免费服务，请见谅。<br /><br />下载链接：http://pan.baidu.com/s/1kUUVjCV&nbsp; &nbsp; 提取码：eife &nbsp;自立更生互助QQ群：CKeditor_Plugins_for_Qiniu&nbsp;<strong><a rel="nofollow" target="_blank" href="http://shang.qq.com/wpa/qunwpa?idkey=399456d39b664781c278dd036ae7c835f195659993735b0c8b99dbe77bcffd74">159257448</a></strong></p></div>
+	<div class="updown"><div id="good"><span class="ift icon-good"></span><span id="countgd">16</span></div><div id="bad"><span class="ift icon-trample"></span><span id="countbd">0</span></div></div>
+		<div class="same-bd br pt15">
+						<ul>
+						</ul>
+		</div>
+	<div class="banquan">
+		<p>本站原创内容请勿转载，因为这样大家可以聚集在这里讨论，请将本文链接分享给他/她!
+		</p>
+	</div>
+	<div class="content bl">
+		<div class="h-t bl pt25"><div class="t-text">文章讨论</div><hr></div>
+		<div class="content-bd bl pt15">
+		<ul>
+			</ul>
+		</div>
+	</div>
+	
+	<div class="same br pt25">
+		<div class="h-t br pt25">
+			<div class="t-text">延伸阅读</div>
+			<hr>
+		</div>
+		<div class="hotlist-bd br pt15">
+			<ul><li class="hot-1"><a href="/m/disarry/10.html" title="CKeditor七牛云JS SDK前端上传插件修改">CKeditor七牛云JS SDK前端上传插件修改</a></li>
+<li class="hot-2"><a href="/m/disarry/21.html" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-3"><a href="/m/disarry/23.html" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-4"><a href="/m/disarry/7.html" title="DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本">DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本</a></li>
+<li class="hot-5"><a href="/m/disarry/11.html" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+<li class="hot-6"><a href="/m/disarry/20.html" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-7"><a href="/m/disarry/22.html" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-8"><a href="/m/disarry/13.html" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-9"><a href="/m/disarry/18.html" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+<li class="hot-10"><a href="/m/disarry/17.html" title="DeDeCMS(织梦)相关文章调用优化">DeDeCMS(织梦)相关文章调用优化</a></li>
+
+			</ul>
+		</div>
+	</div>
+	</div>
+	<div id="content-right">
+		
+		<div class="hottag br pt25">
+          <div class="h-t br">
+            <div class="t-text">热门标签</div>
+            <hr>
+          </div>
+          <div class="hottag-bd br pt15">
+            <ul>
+            </ul>
+          </div>
+        </div>
+		
+		<div class="hotlist br pt25">
+          <div class="h-t br">
+            <div class="t-text">热文文章</div>
+            <hr>
+          </div>
+          <div class="hotlist-bd br pt15">
+            <ul><li class="hot-1"><a href="/m/disarry/10.html" title="CKeditor七牛云JS SDK前端上传插件修改">CKeditor七牛云JS SDK前端上传插件修改</a></li>
+<li class="hot-2"><a href="/m/disarry/21.html" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-3"><a href="/m/disarry/23.html" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-4"><a href="/m/disarry/7.html" title="DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本">DeDeCMS PHP7.0+环境支持及DeDeCMS安全脚本</a></li>
+<li class="hot-5"><a href="/m/disarry/11.html" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+<li class="hot-6"><a href="/m/disarry/20.html" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-7"><a href="/m/disarry/22.html" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-8"><a href="/m/disarry/13.html" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-9"><a href="/m/disarry/18.html" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+<li class="hot-10"><a href="/m/disarry/17.html" title="DeDeCMS(织梦)相关文章调用优化">DeDeCMS(织梦)相关文章调用优化</a></li>
+
+            </ul>
+          </div>
+        </div>
+		
+		<div class="hotlist br pt25">
+          <div class="h-t br">
+            <div class="t-text">最新文章</div>
+            <hr>
+          </div>
+          <div class="hotlist-bd br pt15">
+            <ul><li class="hot-1"><a href="/m/disarry/25.html" title="商品规格属性联动筛选实现方案">商品规格属性联动筛选实现方案</a></li>
+<li class="hot-2"><a href="/m/disarry/23.html" title="阿里云OSS、七牛云CKeditor上传插件">阿里云OSS、七牛云CKeditor上传插件</a></li>
+<li class="hot-3"><a href="/m/disarry/22.html" title="织梦主动推送功能（百度SEO）">织梦主动推送功能（百度SEO）</a></li>
+<li class="hot-4"><a href="/m/disarry/21.html" title="DeDeCMS织梦短信验证码功能">DeDeCMS织梦短信验证码功能</a></li>
+<li class="hot-5"><a href="/m/disarry/20.html" title="新版CKeditor七牛云插件修改">新版CKeditor七牛云插件修改</a></li>
+<li class="hot-6"><a href="/m/disarry/19.html" title="DeDeCMS文章分页聚合功能优化">DeDeCMS文章分页聚合功能优化</a></li>
+<li class="hot-7"><a href="/m/disarry/18.html" title="中国为什么没有令人景仰的国际品牌">中国为什么没有令人景仰的国际品牌</a></li>
+<li class="hot-8"><a href="/m/disarry/17.html" title="DeDeCMS(织梦)相关文章调用优化">DeDeCMS(织梦)相关文章调用优化</a></li>
+<li class="hot-9"><a href="/m/disarry/13.html" title="为什么DeDeCMS不安全？DeDeCMS后台安全性讨论">为什么DeDeCMS不安全？DeDeCMS后台安全性讨论</a></li>
+<li class="hot-10"><a href="/m/disarry/11.html" title="织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS">织梦(DeDeCMS)整合七牛云,织梦整合阿里云OSS</a></li>
+
+            </ul>
+          </div>
+        </div>
+	</div>
+</div>
+</div>
+<div class="f-warp pt25">
+<div class="footer">
+	<div class="f-dspay fr">
+		<div class="imgbox fl"><img src="/m/skin/images/zfb.png" title="支付宝打赏二维码" class="zfb cl" /><span class="t">支付宝二维码</span></div>
+		<div class="imgbox fr"><img src="/m/skin/images/wx.png" title="微信打赏二维码" class="wx cl" /><span class="t">微信二维码</span></div>
+	</div>
+	<a id="go-top" href="javascript:void(0)" class="ift icon-top"></a>
+	<div class="copyright cl">&copy; 2010-2016 城子居（https://imyme.cn）版权所有  &nbsp;&nbsp;网站备案：<a href="http://www.miibeian.gov.cn/" rel="nofollow" >粤ICP备14066401号</a><a href="http://wpa.qq.com/msgrd?v=3&uin=857859975" rel="nofollow" target="_blank"><i class="ift icon-qq"></a></i>&nbsp;&nbsp;<a href="/m/about/">博主</a></div>
+</div>
+</div>
+<script type="text/javascript" src="https://ss1.bdstatic.com/5eN1bjq8AAUYm2zgoY3K/r/www/cache/static/protocol/https/jquery/jquery-1.10.2.min_f2fb5194.js"></script>
+<script type="text/javascript" src="/m/skin/js/config.js"></script>
+<script type="text/javascript">if(top != self){location.href = "about:blank";}</script>
+
+<div id="imgviewbox"><img id="imgview" src="" alt="" /><i id="close">x</i></div>
+<script type="text/javascript" async src="/m/skin/js/jquery.qrcode.min.js"></script>
+<script type="text/javascript">
+
+var a = 20;
+var t = "新版CKeditor七牛云插件修改";
+var f = "之前写的《CKeditor七牛云JS SDK前端上传插件修改》是没有优化压缩过的，而且在返回图片地址的时候，有点问题没处理好。这里新优化了一下，做了一个新的CKeditor七牛云上传插件。";
+var ba ="https://imyme.cn";
+
+var d = document.domain;
+var c = 'i' + 'm' + 'y' + 'm' + 'e' + '.' + 'c' + 'n';
+if (d !== c) {
+	$("body").remove()
+}
+$(window).load(function() {
+	var aid = a;
+	var top = window.screen.height / 2 - 250;
+	var left = window.screen.width / 2 - 300;
+	var title = t;
+	var pic = $(".arctext img").attr("src");
+	var rLink = window.location.href;
+	var site = "<a href=\"" + ba + "\">" + ba + "</a>";
+	var summary = f;
+
+	function shareTSina(title, rLink, site, pic) {
+		window.open("http://service.weibo.com/share/share.php?pic=" + encodeURIComponent(pic) + "&title=" + encodeURIComponent(title.replace(/&nbsp;/g, " ").replace(/<br \/>/g, " ")) + "&url=" + encodeURIComponent(rLink), "share weibo", "height=500,width=600,top=" + top + ",left=" + left + ",toolbar=no,menubar=no,scrollbars=no, resizable=no,location=no, status=no")
+	}
+	function shareQzone(title, rLink, summary, site, pic) {
+		window.open('http://sns.qzone.qq.com/cgi-bin/qzshare/cgi_qzshare_onekey?title=' + encodeURIComponent(title) + '&url=' + encodeURIComponent(rLink) + '&summary=' + encodeURIComponent(summary) + '&site=' + encodeURIComponent(site), '_blank', 'scrollbars=no,width=600,height=450,left=' + left + ',top=' + top + ',status=no,resizable=yes')
+	}
+	function count(x) {
+		var gourl = ba + '/m/plus/fb_count.php?aid=' + aid + '&' + x;
+		var getjson = $.ajax({
+			url: gourl,
+			async: false
+		});
+		var obj = eval('(' + getjson.responseText + ')');
+		var content = 0;
+		var content = parseInt(obj.goodpost) + parseInt(obj.badpost);
+		$("#countgd").text(obj.goodpost);
+		$("#countbd").text(obj.badpost);
+		$("#content").text(content)
+	}
+	$("#good").click(function() {
+		if (GetCookie("gbpost")) {
+			var str = GetCookie("gbpost");
+			if (str.indexOf("|" + aid + "|") > -1) {
+				return false
+			}
+		}
+		count("good");
+		SetCookieStr("gbpost", aid, 31);
+		$("#good").children().css("color", "#FF4400")
+	});
+	$("#bad").click(function() {
+		if (GetCookie("gbpost")) {
+			var str = GetCookie("gbpost");
+			if (str.indexOf("|" + aid + "|") > -1) {
+				return false
+			}
+		}
+		count("bad");
+		SetCookieStr("gbpost", aid, 31);
+		$("#bad").children().css("color", "#FF4400")
+	});
+	$("#shwb").click(function() {
+		shareTSina(title, rLink, site, pic)
+	});
+	$("#shqzone").click(function() {
+		shareQzone(title, rLink, summary, site, pic)
+	});
+	$("#qrcode").click(function() {
+		if ($("#qrcode").children().length > 0) {
+			$("#qrcode").children().show();
+			setTimeout('$("#qrcode").children().hide();', 5000)
+		} else {
+			$('#qrcode').qrcode({
+				width: 120,
+				height: 120,
+				text: rLink
+			});
+			setTimeout('$("#qrcode").children().hide();', 5000)
+		}
+	});
+	count();
+	(function() {
+		var nSearch = null;
+		var nSearch = $("#nSearch");
+		var but = nSearch.next("i[class=ift icon-search]");
+		var promptText = nSearch.attr("placeholder");
+		but.css({
+			cursor: "pointert"
+		});
+		nSearch.focus(function() {
+			var searchVal = nSearch.val();
+			if (searchVal == promptText) nSearch.val("")
+		});
+		var pattern = new RegExp("^\\s*$", "i");
+		but.click(function() {
+			var searchVal = nSearch.val();
+			var link = "/m/plus/search.php?q=";
+			if (searchVal == promptText) {
+				nSearch.show();
+				return
+			}
+			if (!pattern.test(searchVal)) {
+				link += searchVal;
+				window.open(link);
+				nSearch.hide();
+				nSearch.val(promptText)
+			} else {
+				nSearch.val(promptText);
+				nSearch.show();
+				return
+			}
+		});
+		$(document).keydown(function(e) {
+			if (!e) e = window.event;
+			if ((e.keyCode || e.which) == 13) {
+				if (nSearch.val() == "") return;
+				but.click()
+			}
+		})
+	})()
+})
+function postBadGood(x, y, obj) {
+	var aid = a;
+	var fid = y;
+	var stype = x;
+	var str = GetCookie('ffid');
+	var time = Math.round(new Date().getTime() / 1000);
+	var url = ba + '/m/plus/feedback.php';
+	if (GetCookie('ffid')) {
+		if (str.indexOf("|" + fid + "|") > -1) {
+			return false
+		}
+	}
+	if (time - GetCookie('ptime') < 5) {
+		alert("Too Fast!");
+		return false
+	}
+	$.ajax({
+		type: 'POST',
+		url: url,
+		data: {
+			'aid': aid,
+			'fid': fid,
+			'stype': stype
+		},
+		async: true,
+		dataType: 'json'
+	});
+	SetCookieStr('ffid', fid, 31);
+	SetCookie('ptime', time, 31);
+	obj.css("color", "#FF4400");
+	var tcont = obj.children("i").text();
+	tcont = parseInt(tcont) + 1;
+	obj.children("i").text(tcont)
+}
+$(".arctext").find("img").click(function() {
+	var imgurl = $(this)[0].src;
+	$("body").css({
+		"overflow": "hidden",
+		"margin-right": "10px"
+	});
+	$("#imgview").attr('src', imgurl);
+	$("#imgviewbox").css({
+		"display": "table-cell"
+	});
+	$("#imgview").css({
+		"position": "fixed",
+		"top": "40px",
+		"left": "0"
+	});
+	moveimg()
+});
+$("#imgviewbox").on('touchmove', function(event) {
+	event.stopPropagation()
+},false);
+$("#close").click(function() {
+	$("#imgview").attr('src', '');
+	$("body").css({
+		"overflow": "auto",
+		"margin-right": "0"
+	});
+	$("#imgviewbox").css({
+		"display": "none"
+	});
+	$("#imgview").removeAttr('width');
+	$("#imgview").removeAttr('height')
+});
+$("#imgview").click(function() {
+	var nw = $(this)[0].naturalWidth;
+	var nh = $(this)[0].naturalHeight;
+	$(this).css({
+		"position": "fixed",
+		"top": "40px",
+		"left": "0"
+	});
+	if ($("#imgview").attr('width') > nw) {
+		$("#imgview").attr('width', nw);
+		$("#imgview").attr('height', nh)
+	} else {
+		$("#imgview").attr('width', nw * 2);
+		$("#imgview").attr('height', nh * 2)
+	}
+});
+
+function moveimg() {
+	var t_startY;
+	var t_startX;
+	var m_startX;
+	var m_startY;
+
+	function touchStart(e) {
+		var touches = e.changedTouches;
+		var	l = touches.length;
+		var	touch;
+		if (l = 1) {
+			touch = touches[0];
+			t_startY = touch.pageY;
+			t_startX = touch.pageX;
+			m_startY = parseInt($(this).css('top'));
+			m_startX = parseInt($(this).css('left'))
+		}
+	}
+	function touchMove(e) {
+		var touches = e.targetTouches;
+		var	l = touches.length;
+		var	touch;
+		if (l = 1) {
+			touch = touches[0];
+			var move_y = touch.pageY - t_startY;
+			var move_x = touch.pageX - t_startX;
+			var x = m_startX + move_x;
+			var y = m_startY + move_y;
+			$(this).css({
+				"top": y,
+				"left": x
+			})
+		}
+	}
+	document.getElementById("imgview").addEventListener("touchstart", touchStart, false);
+	document.getElementById("imgview").addEventListener("touchmove", touchMove, false)
+}
+
+</script>
+</body>
+</html>
